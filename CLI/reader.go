@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
 
 /* reader.go
@@ -35,14 +36,25 @@ func main() {
 
 	for {
 		fmt.Print("-> ")
+
+		// Get the next input line from stdin
 		text, err := reader.ReadString('\n')
 
+		// If error while getting line quit
 		if err != nil {
 			fmt.Print(err.Error())
 			os.Exit(1)
 		}
 
-		fmt.Println(text)
+		// splits the input on whitespace
+		words := strings.Fields(text)
+		if len(words) == 0 || len(words) > 2 {
+			fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
+		}
+
+		if len(words) == 1 && strings.ToLower(words[0]) == "q" {
+			break
+		}
 	}
 
 }
