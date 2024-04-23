@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -16,16 +16,11 @@ func GetURL(url string) string {
 		os.Exit(1)
 	}
 
-	responseData, err := ioutil.ReadAll(response.Body)
+	responseData, err := io.ReadAll(response.Body)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	return string(responseData)
-}
-
-func main() {
-	res := GetURL("http://localhost:8080")
-	fmt.Println(res)
 }
