@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 )
@@ -12,6 +13,7 @@ import (
 // and a *http.Request which is used to et info about the request
 func getRoot(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Hello world!")
+	io.WriteString(w, "Request received!\n")
 }
 
 func main() {
