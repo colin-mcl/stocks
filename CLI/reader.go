@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -42,7 +43,7 @@ func main() {
 
 		// If error while getting line quit
 		if err != nil {
-			fmt.Print(err.Error())
+			log.Fatal(err)
 			os.Exit(1)
 		}
 
