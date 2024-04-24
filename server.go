@@ -7,6 +7,8 @@ import (
 
 func main() {
 	router := gin.Default()
-	router.GET("/tickers", controllers.GetTicker)
+	router.GET("/tickers/:symbol", controllers.GetTicker)
 
+	// Runs the server on localhost:8080 by default
+	router.Run()
 }
