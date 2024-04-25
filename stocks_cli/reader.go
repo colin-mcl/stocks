@@ -60,7 +60,8 @@ func main() {
 			if strings.ToLower(words[0]) == "q" {
 				break
 			} else {
-				fmt.Fprint(os.Stderr, "Not enough arguments, please provide ticker name")
+				fmt.Fprint(os.Stderr, "Not enough arguments, please provide ticker name.\n")
+				continue
 			}
 		}
 
@@ -88,7 +89,7 @@ func handleRequest(ticker string) error {
 	if err != nil {
 		return err
 	} else if len(shell.QuoteResponse.Result) == 0 {
-		return errors.New("Ticker not found")
+		return errors.New(fmt.Sprintf("Ticker %s not found.\n", ticker))
 	}
 
 	s, err := StructToString(&shell.QuoteResponse.Result[0])
@@ -97,6 +98,6 @@ func handleRequest(ticker string) error {
 		return err
 	}
 
-	fmt.Print(s)
+	fmt.Printf("%s\n", s)
 	return nil
 }
