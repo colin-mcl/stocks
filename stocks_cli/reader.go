@@ -2,8 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -53,9 +56,47 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
 		}
 
-		if len(words) == 1 && strings.ToLower(words[0]) == "q" {
-			break
+		if len(words) == 1 {
+			if strings.ToLower(words[0]) == "q" {
+				break
+			} else {
+				fmt.Fprint(os.Stderr, "Not enough arguments, please provide ticker name")
+			}
+		}
+
+		err = handleRequest(strings.ToUpper(words[1]))
+
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
 		}
 	}
 
+}
+
+// TODO: make this an env variable?
+func handleRequest(ticker string) error {
+	url := fmt.Sprintf("http://localhost:8080/tickers/%s", ticker)
+	res, err := http.Get(url)
+
+	if err != nil {
+		return err
+	}
+
+	var shell rspShell
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&shell)
+	if err != nil {
+		return err
+	} else if len(shell.QuoteResponse.Result) == 0 {
+		return errors.New("Ticker not found")
+	}
+
+	s, err := StructToString(&shell.QuoteResponse.Result[0])
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Print(s)
+	return nil
 }
