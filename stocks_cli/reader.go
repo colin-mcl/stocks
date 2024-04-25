@@ -65,39 +65,36 @@ func main() {
 			}
 		}
 
-		err = handleRequest(strings.ToUpper(words[1]))
+		res, err := handleGetRequest(strings.ToUpper(words[1]))
+
+		s, err := StructToString(res)
 
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 		}
+
+		fmt.Printf("%s\n", s)
 	}
 
 }
 
 // TODO: make this an env variable?
-func handleRequest(ticker string) error {
+func handleGetRequest(ticker string) (*Result, error) {
 	url := fmt.Sprintf("http://localhost:8080/tickers/%s", ticker)
 	res, err := http.Get(url)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var shell rspShell
 	d := json.NewDecoder(res.Body)
 	err = d.Decode(&shell)
 	if err != nil {
-		return err
+		return nil, err
 	} else if len(shell.QuoteResponse.Result) == 0 {
-		return errors.New(fmt.Sprintf("Ticker %s not found.\n", ticker))
+		return nil, errors.New(fmt.Sprintf("Ticker %s not found.\n", ticker))
 	}
 
-	s, err := StructToString(&shell.QuoteResponse.Result[0])
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("%s\n", s)
-	return nil
+	return &shell.QuoteResponse.Result[0], nil
 }
