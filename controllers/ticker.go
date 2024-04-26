@@ -60,18 +60,22 @@ func GetTicker(c *gin.Context) {
 	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, symbol), nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
 	}
 	req.Header.Set("x-api-key", api_key)
 
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
 	}
+	defer response.Body.Close()
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
 	}
 
 	var badKey badResponse
@@ -79,6 +83,7 @@ func GetTicker(c *gin.Context) {
 	err = d.Decode(&badKey)
 	if err != nil || badKey.Message != "" {
 		c.Data(http.StatusForbidden, gin.MIMEJSON, bodyBytes)
+		return
 	}
 
 	c.Data(http.StatusOK, gin.MIMEJSON, bodyBytes)

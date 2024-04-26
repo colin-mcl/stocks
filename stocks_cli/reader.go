@@ -30,6 +30,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -74,17 +75,23 @@ func main() {
 			if strings.ToLower(words[0]) == "q" {
 				break
 			} else {
-				fmt.Fprint(os.Stderr, "Not enough arguments, please provide ticker name.\n")
+				fmt.Fprintln(os.Stderr, "Not enough arguments, please provide ticker name.")
 				continue
 			}
 		}
 
 		res, err := handleGetRequest(strings.ToUpper(words[1]))
 
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			continue
+		}
+
 		s, err := StructToString(res)
 
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			fmt.Fprintln(os.Stderr, err.Error())
+			continue
 		}
 
 		fmt.Printf("%s\n", s)
@@ -98,6 +105,12 @@ func handleGetRequest(ticker string) (*Result, error) {
 
 	if err != nil {
 		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(res.Body)
+		return nil, errors.New(fmt.Sprintf("%s\n%s", res.Status, string(bodyBytes)))
 	}
 
 	var shell rspShell
