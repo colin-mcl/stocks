@@ -1,16 +1,5 @@
 package main
 
-import (
-	"bufio"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"log"
-	"net/http"
-	"os"
-	"strings"
-)
-
 /* reader.go
 
 Colin Mclaughlin, April 2024
@@ -35,6 +24,17 @@ Usage is as follows:
 	-> get TSLA
 	...
 */
+
+import (
+	"bufio"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+)
 
 var serverURL string
 
@@ -92,7 +92,6 @@ func main() {
 
 }
 
-// TODO: make this an env variable?
 func handleGetRequest(ticker string) (*Result, error) {
 	url := fmt.Sprintf("%s/tickers/%s", serverURL, ticker)
 	res, err := http.Get(url)
