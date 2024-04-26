@@ -23,6 +23,11 @@ the program can be run with go run reader.go.
 It accepts the following options:
 	- N/A for now
 
+
+The following environment variables must be set:
+	- STOCKS_URL=your_stocks_serverurl
+		e.g. http://localhost:8080
+
 Usage is as follows:
 							STOCKS PROGRAM
 	Please enter 'get' followed by the stock ticker you would like to retrieve
@@ -31,8 +36,17 @@ Usage is as follows:
 	...
 */
 
+var serverURL string
+
 func main() {
 	reader := bufio.NewReader(os.Stdin)
+	serverURL = os.Getenv("STOCKS_URL")
+
+	if serverURL == "" {
+		fmt.Fprintln(os.Stderr, "Please set the STOCKS_URL environment variable"+
+			"to your stock server address and restart the program.")
+		os.Exit(1)
+	}
 
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
@@ -80,7 +94,7 @@ func main() {
 
 // TODO: make this an env variable?
 func handleGetRequest(ticker string) (*Result, error) {
-	url := fmt.Sprintf("http://localhost:8080/tickers/%s", ticker)
+	url := fmt.Sprintf("%s/tickers/%s", serverURL, ticker)
 	res, err := http.Get(url)
 
 	if err != nil {
