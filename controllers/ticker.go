@@ -48,8 +48,6 @@ var api_key string
 
 // 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD
 // Yahoo finance API key
-// TODO: make this an environment variable
-
 func GetTicker(c *gin.Context) {
 	if api_key == "" {
 		api_key = os.Getenv("STOCKS_API_KEY")

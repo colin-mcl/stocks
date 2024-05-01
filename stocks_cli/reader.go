@@ -45,7 +45,7 @@ func main() {
 
 	if serverURL == "" {
 		fmt.Fprintln(os.Stderr, "Please set the STOCKS_URL environment variable"+
-			"to your stock server address and restart the program.")
+			" to your stock server address and restart the program.")
 		os.Exit(1)
 	}
 
