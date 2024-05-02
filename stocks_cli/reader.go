@@ -53,6 +53,7 @@ func main() {
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
+	// infinite loop for user input
 	for {
 		fmt.Print("-> ")
 
@@ -71,6 +72,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
 		}
 
+		// as of 5/2/24 only option is get 'ticker' or q to quit
 		if len(words) == 1 {
 			if strings.ToLower(words[0]) == "q" {
 				break
@@ -80,7 +82,7 @@ func main() {
 			}
 		}
 
-		res, err := handleGetRequest(strings.ToUpper(words[1]))
+		res, err := handle_get_request(strings.ToUpper(words[1]))
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
@@ -99,7 +101,12 @@ func main() {
 
 }
 
-func handleGetRequest(ticker string) (*Result, error) {
+// handle_get_request
+// helper function that makes the get ticker request to the server and unmarshals
+// the json result into the result struct, returning a pointer to the struct
+// and any errors that occured.
+func handle_get_request(ticker string) (*Result, error) {
+	// Makes get request to HTTP endpoint set by environment variable
 	url := fmt.Sprintf("%s/tickers/%s", serverURL, ticker)
 	res, err := http.Get(url)
 
@@ -108,14 +115,17 @@ func handleGetRequest(ticker string) (*Result, error) {
 	}
 	defer res.Body.Close()
 
+	// deal with any error from bad status code
 	if res.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(res.Body)
 		return nil, errors.New(fmt.Sprintf("%s\n%s", res.Status, string(bodyBytes)))
 	}
 
+	// decode the json response into a result struct defined in structs.go
 	var shell rspShell
 	d := json.NewDecoder(res.Body)
 	err = d.Decode(&shell)
+
 	if err != nil {
 		return nil, err
 	} else if len(shell.QuoteResponse.Result) == 0 {
