@@ -82,7 +82,7 @@ func main() {
 			}
 		}
 
-		res, err := handle_get_request(strings.ToUpper(words[1]))
+		res, err := handleGetRequest(strings.ToUpper(words[1]))
 
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())

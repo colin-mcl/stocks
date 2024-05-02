@@ -20,7 +20,7 @@ import (
 
 var api_key string
 
-func init_key() {
+func initKey() {
 	// 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD
 	// Yahoo finance API key
 	// Gets API key from environment variable
@@ -32,7 +32,7 @@ func init_key() {
 // init_request
 // wrapper function for net/http.NewRequest that accepts the same parameters
 // and adds the api key to the header
-func init_request(method string, url string, body io.Reader) (*http.Request, error) {
+func initRequest(method string, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err

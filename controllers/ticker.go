@@ -45,13 +45,13 @@ type badResponse struct {
 
 func GetTicker(c *gin.Context) {
 	if api_key == "" {
-		init_key()
+		initKey()
 	}
 
 	symbol := c.Param("symbol")
 
 	// Create new HTTP request and add API key to the header
-	req, err := init_request("GET", fmt.Sprintf(yahooURL, symbol), nil)
+	req, err := initRequest("GET", fmt.Sprintf(yahooURL, symbol), nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
