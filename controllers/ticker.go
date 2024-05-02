@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,24 +43,21 @@ type badResponse struct {
 // Example request:
 // https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=AAPL
 
-var api_key string
-
-// 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD
-// Yahoo finance API key
 func GetTicker(c *gin.Context) {
 	if api_key == "" {
-		api_key = os.Getenv("STOCKS_API_KEY")
+		init_key()
 	}
 
 	symbol := c.Param("symbol")
 
-	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, symbol), nil)
+	// Create new HTTP request and add API key to the header
+	req, err := init_request("GET", fmt.Sprintf(yahooURL, symbol), nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	req.Header.Set("x-api-key", api_key)
 
+	// Make HTTP request with the default client
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -69,6 +65,7 @@ func GetTicker(c *gin.Context) {
 	}
 	defer response.Body.Close()
 
+	// Read the body of the response as a slice of bytes and reset the io Reader
 	bodyBytes, err := io.ReadAll(response.Body)
 	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 	if err != nil {
@@ -77,6 +74,8 @@ func GetTicker(c *gin.Context) {
 	}
 
 	var badKey badResponse
+
+	// Check if we got a bad response bc of no API key set
 	d := json.NewDecoder(response.Body)
 	err = d.Decode(&badKey)
 	if err != nil || badKey.Message != "" {
