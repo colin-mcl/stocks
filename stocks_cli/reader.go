@@ -101,11 +101,11 @@ func main() {
 
 }
 
-// handle_get_request
+// handleGetRequest
 // helper function that makes the get ticker request to the server and unmarshals
 // the json result into the result struct, returning a pointer to the struct
 // and any errors that occured.
-func handle_get_request(ticker string) (*Result, error) {
+func handleGetRequest(ticker string) (*Result, error) {
 	// Makes get request to HTTP endpoint set by environment variable
 	url := fmt.Sprintf("%s/tickers/%s", serverURL, ticker)
 	res, err := http.Get(url)
