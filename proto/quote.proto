@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+import "ticker.proto";
+
+message Quote {
+    bytes error = 1;
+    repeated Ticker result = 2;
+}

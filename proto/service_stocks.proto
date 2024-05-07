@@ -7,5 +7,5 @@ import "rpc_get_ticker.proto";
 option go_package = "github.com/colin-mcl/stocks/pb";
 
 service Stocks {
-    rpc getTicker (GetTickerRequest) returns (GetTickerResponse) {}
+    rpc GetTicker (GetTickerRequest) returns (GetTickerResponse) {}
 }

@@ -28,7 +28,7 @@ func runGrpcServer() {
 	// Allows a grpc client to explore which rpc calls are available
 	reflection.Register(grpcServer)
 
-	listener, err := net.Listen("tcp", "localhost:50051")
+	listener, err := net.Listen("tcp", "localhost:9090")
 	if err != nil {
 		log.Fatal("cannot create listener:", err)
 	}

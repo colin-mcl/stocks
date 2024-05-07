@@ -35,7 +35,7 @@ func NewStocksClient(cc grpc.ClientConnInterface) StocksClient {
 
 func (c *stocksClient) GetTicker(ctx context.Context, in *GetTickerRequest, opts ...grpc.CallOption) (*GetTickerResponse, error) {
 	out := new(GetTickerResponse)
-	err := c.cc.Invoke(ctx, "/pb.Stocks/getTicker", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.Stocks/GetTicker", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _Stocks_GetTicker_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Stocks/getTicker",
+		FullMethod: "/pb.Stocks/GetTicker",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(StocksServer).GetTicker(ctx, req.(*GetTickerRequest))
@@ -96,7 +96,7 @@ var Stocks_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*StocksServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "getTicker",
+			MethodName: "GetTicker",
 			Handler:    _Stocks_GetTicker_Handler,
 		},
 	},
