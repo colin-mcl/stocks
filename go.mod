@@ -4,6 +4,7 @@ go 1.21.0
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang/protobuf v1.5.4
 	github.com/stretchr/testify v1.8.3
 	google.golang.org/grpc v1.63.2
 	google.golang.org/protobuf v1.34.1

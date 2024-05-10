@@ -27,6 +27,7 @@ Usage is as follows:
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,12 +36,16 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/colin-mcl/stocks/pb"
+	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var serverURL string
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
 	serverURL = os.Getenv("STOCKS_URL")
 
 	if serverURL == "" {
@@ -49,63 +54,72 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Set up connection to the grpc server
+	conn, err := grpc.Dial(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("failed to cnnnect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pb.NewStocksClient(conn)
+
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
 	// infinite loop for user input
-	for {
-		fmt.Print("-> ")
+	for loop(c) {
 
-		// Get the next input line from stdin
-		text, err := reader.ReadString('\n')
-
-		// If error while getting line quit
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(1)
-		}
-
-		// splits the input on whitespace
-		words := strings.Fields(text)
-		if len(words) == 0 || len(words) > 2 {
-			fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
-		}
-
-		// as of 5/2/24 only option is get 'ticker' or q to quit
-		if len(words) == 1 {
-			if strings.ToLower(words[0]) == "q" {
-				break
-			} else {
-				fmt.Fprintln(os.Stderr, "Not enough arguments, please provide ticker name.")
-				continue
-			}
-		}
-
-		res, err := handleGetRequest(strings.ToUpper(words[1]))
-
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			continue
-		}
-
-		s, err := StructToString(res)
-
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			continue
-		}
-
-		fmt.Printf("%s\n", s)
 	}
 
+}
+
+func loop(c pb.StocksClient) bool {
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("-> ")
+
+	// Get the next input line from stdin
+	text, err := reader.ReadString('\n')
+
+	// If error while getting line quit
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	// splits the input on whitespace
+	words := strings.Fields(text)
+	if len(words) == 0 || len(words) > 2 {
+		fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
+	}
+
+	// as of 5/2/24 only option is get 'ticker' or q to quit
+	if len(words) == 1 {
+		if strings.ToLower(words[0]) == "q" {
+			return false
+		} else {
+			fmt.Fprintln(os.Stderr, "Not enough arguments, please provide ticker name.")
+			return true
+		}
+	}
+
+	res, err := c.GetTicker(context.Background(), &pb.GetTickerRequest{Symbol: strings.ToUpper(words[1])})
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to get ticker: %v\n", err)
+		return true
+	}
+	fmt.Println(proto.MarshalTextString(res))
+
+	return true
 }
 
 // handleGetRequest
 // helper function that makes the get ticker request to the server and unmarshals
 // the json result into the result struct, returning a pointer to the struct
 // and any errors that occured.
-func handleGetRequest(ticker string) (*Result, error) {
+func handleHTTPGetRequest(ticker string) (*Result, error) {
 	// Makes get request to HTTP endpoint set by environment variable
 	url := fmt.Sprintf("%s/tickers/%s", serverURL, ticker)
 	res, err := http.Get(url)
