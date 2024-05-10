@@ -62,7 +62,7 @@ message Ticker {
     uint32 earningsTimestampEnd = 55;
     double trailingAnnualDividendRate = 56;
     double trailingPE = 57;
-    uint32 dividendRate = 58;
+    double dividendRate = 58;
     double trailingAnnualDividendYield = 59;
     double dividendYield = 60;
     double epsTrailingTwelveMonths = 61;
@@ -87,4 +87,7 @@ message Ticker {
     bool cryptoTradeable = 80;
     string displayName = 81;
     string symbol = 82;
+    string ipoExpectedDate = 83;
+    string prevName = 84;
+    string nameChangeDate = 85;
 }
