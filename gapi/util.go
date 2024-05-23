@@ -24,9 +24,7 @@ func initKey() {
 	// 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD
 	// Yahoo finance API key
 	// Gets API key from environment variable
-	if api_key == "" {
-		api_key = os.Getenv("STOCKS_API_KEY")
-	}
+	api_key = os.Getenv("STOCKS_API_KEY")
 }
 
 // init_request

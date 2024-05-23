@@ -29,16 +29,13 @@ type badResponse struct {
 // Example request:
 // https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=AAPL
 func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*pb.GetTickerResponse, error) {
-	if api_key == "" {
-		initKey()
-	}
 
 	// Create new HTTP request and add API key to the header
-	req, err := initRequest("GET", fmt.Sprintf(yahooURL, r.GetSymbol()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, r.GetSymbol()), nil)
+	req.Header.Set("x-api-key", server.api_key)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create GET request")
+		return nil, status.Errorf(codes.Internal, "failed to create request %s", err)
 	}
-
 	// Make HTTP request with the default client
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -61,7 +58,7 @@ func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*p
 	d := json.NewDecoder(response.Body)
 	err = d.Decode(&badKey)
 	if err != nil || badKey.Message != "" {
-		return nil, status.Errorf(codes.Internal, "bad API key")
+		return nil, status.Errorf(codes.Internal, "bad API key: %s", api_key)
 	}
 
 	y := &pb.YhResponse{}
@@ -71,18 +68,10 @@ func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*p
 		return nil, status.Errorf(codes.Internal, "failed to unmarshal to yahoo response: %s", err)
 	}
 
-	// q := &pb.Quote{}
-	// err = protojson.Unmarshal(y.GetQ(), q)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to unmarshal to quote : %s", err)
-	// }
+	tickers := y.GetQuoteResponse().GetResult()
+	if len(tickers) == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid ticker symbol: %s", r.GetSymbol())
+	}
 
-	// t := &pb.Ticker{}
-	// err = protojson.Unmarshal(q.GetResult(), t)
-
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "failed to unmarshal to ticker: %s", err)
-	// }
-
-	return &pb.GetTickerResponse{Ticker: y.GetQuoteResponse().GetResult()[0]}, nil
+	return &pb.GetTickerResponse{Ticker: tickers[0]}, nil
 }

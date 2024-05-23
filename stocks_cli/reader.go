@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// Set up connection to the grpc server
-	conn, err := grpc.Dial(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to cnnnect: %v", err)
 	}
