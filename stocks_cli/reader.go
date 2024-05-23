@@ -46,6 +46,7 @@ import (
 var serverURL string
 
 func main() {
+	// gets the server URL to make requests or rpcs to
 	serverURL = os.Getenv("STOCKS_URL")
 
 	if serverURL == "" {
@@ -57,7 +58,7 @@ func main() {
 	// Set up connection to the grpc server
 	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to cnnnect: %v", err)
+		log.Fatalf("failed to connect: %v", err)
 	}
 	defer conn.Close()
 
@@ -69,7 +70,6 @@ func main() {
 
 	// infinite loop for user input
 	for loop(c) {
-
 	}
 
 }

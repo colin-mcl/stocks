@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// launches the server to handle http or grpc requests for the stocks service
+// can either use the GRPC server or gin server
 func main() {
 	runGrpcServer()
 }
@@ -28,6 +30,7 @@ func runGrpcServer() {
 	// Allows a grpc client to explore which rpc calls are available
 	reflection.Register(grpcServer)
 
+	// creates a listener to listen for requests on localhost:9090
 	listener, err := net.Listen("tcp", "localhost:9090")
 	if err != nil {
 		log.Fatal("cannot create listener:", err)

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/colin-mcl/stocks/pb"
@@ -15,6 +16,7 @@ import (
 )
 
 // TODO: make region and language options
+// 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD - API key
 const (
 	yahooURL = "https://yfapi.net/v6/finance/quote?symbols=%s&region=US&lang=en"
 )
@@ -26,9 +28,12 @@ type badResponse struct {
 	Hint    string `json:"hint"`
 }
 
+// Handles the GetTicker grpc call by making a get request to the Yahoo
+// finance API and returning the result as a ticker object
 // Example request:
 // https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=AAPL
 func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*pb.GetTickerResponse, error) {
+	log.Printf("get ticker request recieved: %s", r.GetSymbol())
 
 	// Create new HTTP request and add API key to the header
 	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, r.GetSymbol()), nil)
@@ -36,6 +41,7 @@ func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*p
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create request %s", err)
 	}
+
 	// Make HTTP request with the default client
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -68,6 +74,7 @@ func (server *Server) GetTicker(ctx context.Context, r *pb.GetTickerRequest) (*p
 		return nil, status.Errorf(codes.Internal, "failed to unmarshal to yahoo response: %s", err)
 	}
 
+	// Check if we got 0 tickers in the result, implying an invalid symbol
 	tickers := y.GetQuoteResponse().GetResult()
 	if len(tickers) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid ticker symbol: %s", r.GetSymbol())

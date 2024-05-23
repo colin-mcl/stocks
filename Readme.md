@@ -9,15 +9,15 @@
 
 
 ## ℹ️ Overview
-This is a personal interest project made by me (a graduating Tufts senior). I was interested in learning more about Golang, web services and APIs and I have a personal interest in finance so I created this app to combine those interests. The project is currently a work-in-progress but as of May 1, 2024 it provides a simple Go server programmed with the Gin package and net/http. It also provides an interactive command line interface called stocks_cli which can be used to make requests to the server's endpoint.
+This is a personal interest project made by me. I am interested in learning more about Golang, web services and APIs and I have a personal interest in finance so I created this app to combine those interests. The project is currently a work-in-progress but as of May 23, 2024 it provides a simple Go server and interactive command line interface. These services use GRPC to make calls between the CLI and the server, with a very simple setup of protobuf definitions defined in the proto folder.
 
 ## 🚀 Usage
-The project relies on the Yahoo Finance API provided by https://financeapi.net/. Make sure to have the enviroment variable STOCKS_API_KEY set to the API key obtained from that link. Additionally, set the STOCKS_URL environment variable to point to the url of the server, http://localhost:8080 by default.
+The project relies on the Yahoo Finance API provided by https://financeapi.net/. To begin, get an api key from this url by creating an account. Set the environment variable 'STOCKS_API_KEY' to this key, and the environment variable 'STOCKS_URL' to localhost:9090 (for now). Then, run the server and the CLI using the commands below.
 
 ```bash
-$ go run server.go &
-$ cd stocks_cli
-$ go install
+# Launches the server and detaches the process, alternatively, run it in its own shell
+$ make server &
+$ make stocks_cli
 $ stocks_cli
                     STOCKS PROGRAM
 Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit
