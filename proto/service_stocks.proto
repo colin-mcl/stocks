@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package pb;
 
-import "rpc_get_ticker.proto";
+import "rpc_get_quote.proto";
 
 option go_package = "github.com/colin-mcl/stocks/pb";
 
 service Stocks {
-    rpc GetTicker (GetTickerRequest) returns (GetTickerResponse) {}
+    rpc GetQuote (GetQuoteRequest) returns (GetQuoteResponse) {}
 }

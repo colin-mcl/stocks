@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StocksClient interface {
-	GetTicker(ctx context.Context, in *GetTickerRequest, opts ...grpc.CallOption) (*GetTickerResponse, error)
+	GetQuote(ctx context.Context, in *GetQuoteRequest, opts ...grpc.CallOption) (*GetQuoteResponse, error)
 }
 
 type stocksClient struct {
@@ -33,9 +33,9 @@ func NewStocksClient(cc grpc.ClientConnInterface) StocksClient {
 	return &stocksClient{cc}
 }
 
-func (c *stocksClient) GetTicker(ctx context.Context, in *GetTickerRequest, opts ...grpc.CallOption) (*GetTickerResponse, error) {
-	out := new(GetTickerResponse)
-	err := c.cc.Invoke(ctx, "/pb.Stocks/GetTicker", in, out, opts...)
+func (c *stocksClient) GetQuote(ctx context.Context, in *GetQuoteRequest, opts ...grpc.CallOption) (*GetQuoteResponse, error) {
+	out := new(GetQuoteResponse)
+	err := c.cc.Invoke(ctx, "/pb.Stocks/GetQuote", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *stocksClient) GetTicker(ctx context.Context, in *GetTickerRequest, opts
 // All implementations must embed UnimplementedStocksServer
 // for forward compatibility
 type StocksServer interface {
-	GetTicker(context.Context, *GetTickerRequest) (*GetTickerResponse, error)
+	GetQuote(context.Context, *GetQuoteRequest) (*GetQuoteResponse, error)
 	mustEmbedUnimplementedStocksServer()
 }
 
@@ -54,8 +54,8 @@ type StocksServer interface {
 type UnimplementedStocksServer struct {
 }
 
-func (UnimplementedStocksServer) GetTicker(context.Context, *GetTickerRequest) (*GetTickerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTicker not implemented")
+func (UnimplementedStocksServer) GetQuote(context.Context, *GetQuoteRequest) (*GetQuoteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetQuote not implemented")
 }
 func (UnimplementedStocksServer) mustEmbedUnimplementedStocksServer() {}
 
@@ -70,20 +70,20 @@ func RegisterStocksServer(s grpc.ServiceRegistrar, srv StocksServer) {
 	s.RegisterService(&Stocks_ServiceDesc, srv)
 }
 
-func _Stocks_GetTicker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTickerRequest)
+func _Stocks_GetQuote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQuoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StocksServer).GetTicker(ctx, in)
+		return srv.(StocksServer).GetQuote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.Stocks/GetTicker",
+		FullMethod: "/pb.Stocks/GetQuote",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StocksServer).GetTicker(ctx, req.(*GetTickerRequest))
+		return srv.(StocksServer).GetQuote(ctx, req.(*GetQuoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,8 +96,8 @@ var Stocks_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*StocksServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetTicker",
-			Handler:    _Stocks_GetTicker_Handler,
+			MethodName: "GetQuote",
+			Handler:    _Stocks_GetQuote_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

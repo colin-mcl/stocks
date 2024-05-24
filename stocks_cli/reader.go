@@ -104,7 +104,7 @@ func loop(c pb.StocksClient) bool {
 		}
 	}
 
-	res, err := c.GetTicker(context.Background(), &pb.GetTickerRequest{Symbol: strings.ToUpper(words[1])})
+	res, err := c.GetQuote(context.Background(), &pb.GetQuoteRequest{Symbol: strings.ToUpper(words[1])})
 
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to get ticker: %v\n", err)
