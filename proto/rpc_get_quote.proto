@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+import "quote.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+message GetQuoteRequest {
+    string symbol = 1;
+}
+
+message GetQuoteResponse {
+    Quote quote = 1;
+}
+
