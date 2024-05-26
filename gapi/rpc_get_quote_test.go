@@ -1,7 +1,11 @@
 package gapi
 
 import (
+	"bufio"
 	"context"
+	"log"
+	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/colin-mcl/stocks/pb"
@@ -59,5 +63,39 @@ func TestGetQuote(t *testing.T) {
 				require.Equal(t, err, tt.err)
 			}
 		})
+	}
+}
+
+// Tests the GetQuote RPC using a random selection of
+// valid NYSE symbols, expected to be stored in the file symbols.txt one
+// level up froim the gapi directory.
+func TestGetQuoteAll(t *testing.T) {
+	file, err := os.Open("../symbols.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	server := &Server{api_key: good_key}
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		symbol := scanner.Text()
+
+		// only test this symbol if rand() generates 999
+		i := rand.Intn(1000)
+		if i != 999 {
+			continue
+		}
+		resp, err := server.GetQuote(context.Background(),
+			&pb.GetQuoteRequest{Symbol: symbol})
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		require.Equal(t, symbol, resp.GetQuote().Symbol)
 	}
 }

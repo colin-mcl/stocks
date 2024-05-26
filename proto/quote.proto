@@ -26,7 +26,7 @@ message Quote {
     string market = 19;
     bool esgPopulated = 20;
     bool hasPrePostMarketData = 21;
-    uint64 firstTradeDateMilliseconds = 22;
+    int64 firstTradeDateMilliseconds = 22;
     uint32 priceHint = 23;
     double postMarketChangePercent = 24;
     uint32 postMarketTime = 25;
@@ -90,6 +90,11 @@ message Quote {
     string ipoExpectedDate = 83;
     string prevName = 84;
     string nameChangeDate = 85;
+    double ytdReturn = 86;
+    double trailingThreeMonthReturns = 87;
+    double trailingThreeMonthNavReturns = 88;
+    uint32 netAssets = 89;
+    double netExpenseRatio = 90;
 }
 message QuoteResponse {
     bytes error = 1;
