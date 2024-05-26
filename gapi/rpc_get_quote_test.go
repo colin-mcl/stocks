@@ -21,6 +21,7 @@ import (
 // Working API key
 const good_key = "4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD"
 
+// Tests the response of GetQuote if the server has a bad api key
 func TestGetQuoteBadKey(t *testing.T) {
 	server := &Server{api_key: "bad"}
 	resp, err := server.GetQuote(context.Background(), &pb.GetQuoteRequest{Symbol: "TSLA"})
@@ -82,7 +83,7 @@ func TestGetQuoteAll(t *testing.T) {
 	for scanner.Scan() {
 		symbol := scanner.Text()
 
-		// only test this symbol if rand() generates 999
+		// only test this symbol if rand() generates 999a
 		i := rand.Intn(1000)
 		if i != 999 {
 			continue
