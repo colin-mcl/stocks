@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 
 	"github.com/colin-mcl/stocks/controllers"
 	"github.com/colin-mcl/stocks/gapi"
@@ -15,13 +16,17 @@ import (
 // launches the server to handle http or grpc requests for the stocks service
 // can either use the GRPC server or gin server
 func main() {
-	runGrpcServer()
+
+	errorLog := log.New(os.Stderr, "[ERROR]", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLog := log.New(os.Stdout, "[INFO]", log.Ldate|log.Ltime)
+
+	runGrpcServer(errorLog, infoLog)
 }
 
-func runGrpcServer() {
-	server, err := gapi.NewServer()
+func runGrpcServer(errorLog *log.Logger, infoLog *log.Logger) {
+	server, err := gapi.NewServer(errorLog, infoLog)
 	if err != nil {
-		log.Fatal("cannot create server:", err)
+		errorLog.Fatal("cannot create server:", err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -33,14 +38,14 @@ func runGrpcServer() {
 	// creates a listener to listen for requests on localhost:9090
 	listener, err := net.Listen("tcp", ":9090")
 	if err != nil {
-		log.Fatal("cannot create listener:", err)
+		errorLog.Fatal("cannot create listener:", err)
 	}
 
-	log.Printf("startGRPC server at %s", listener.Addr().String())
+	infoLog.Printf("starting GRPC server at %s", listener.Addr().String())
 
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatal("cannot start grpc server:", err)
+		errorLog.Fatal("cannot start grpc server:", err)
 	}
 }
 
