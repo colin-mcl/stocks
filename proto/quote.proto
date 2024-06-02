@@ -95,6 +95,7 @@ message Quote {
     double trailingThreeMonthNavReturns = 88;
     uint32 netAssets = 89;
     double netExpenseRatio = 90;
+    bool isEarningsDateEstimate = 91;
 }
 message QuoteResponse {
     bytes error = 1;

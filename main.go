@@ -31,7 +31,7 @@ func runGrpcServer() {
 	reflection.Register(grpcServer)
 
 	// creates a listener to listen for requests on localhost:9090
-	listener, err := net.Listen("tcp", "localhost:9090")
+	listener, err := net.Listen("tcp", ":9090")
 	if err != nil {
 		log.Fatal("cannot create listener:", err)
 	}

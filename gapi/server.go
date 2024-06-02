@@ -3,8 +3,6 @@ package gapi
 // grpc Server implementation
 
 import (
-	"os"
-
 	"github.com/colin-mcl/stocks/pb"
 )
 
@@ -20,7 +18,8 @@ type Server struct {
 
 func NewServer() (*Server, error) {
 	server := &Server{}
-	server.api_key = os.Getenv("STOCKS_API_KEY")
+	server.api_key = "4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD"
+	// server.api_key = os.Getenv("STOCKS_API_KEY")
 
 	return server, nil
 }

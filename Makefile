@@ -16,4 +16,14 @@ stocks_cli:
 evans:
 	evans --host 127.0.0.1 --port 9090 -r repl
 
-.PHONY: proto server evans
+docker:
+	docker run -p 9090:9090 --name stocks-container stocks
+
+docker-stop:
+	docker stop stocks-container
+	docker rm stocks-container
+
+docker-build:
+	docker build . -t stocks:latest
+
+.PHONY: proto server evans docker docker-stop docker-build
