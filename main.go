@@ -17,8 +17,8 @@ import (
 // can either use the GRPC server or gin server
 func main() {
 
-	errorLog := log.New(os.Stderr, "[ERROR]", log.Ldate|log.Ltime|log.Lshortfile)
-	infoLog := log.New(os.Stdout, "[INFO]", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLog := log.New(os.Stdout, "[INFO] ", log.Ldate|log.Ltime)
 
 	runGrpcServer(errorLog, infoLog)
 }

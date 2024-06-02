@@ -48,17 +48,17 @@ var serverURL string
 func main() {
 	// gets the server URL to make requests or rpcs to
 	serverURL = os.Getenv("STOCKS_URL")
+	errorLog := log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	if serverURL == "" {
-		fmt.Fprintln(os.Stderr, "Please set the STOCKS_URL environment variable"+
+		errorLog.Fatal("Please set the STOCKS_URL environment variable" +
 			" to your stock server address and restart the program.")
-		os.Exit(1)
 	}
 
 	// Set up connection to the grpc server
 	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
+		errorLog.Fatalf("failed to connect: %v", err)
 	}
 	defer conn.Close()
 
@@ -68,13 +68,19 @@ func main() {
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
+	running := true
 	// infinite loop for user input
-	for loop(c) {
+	for running {
+		running, err = loop(c, errorLog)
+
+		if err != nil {
+			errorLog.Fatal(err)
+		}
 	}
 
 }
 
-func loop(c pb.StocksClient) bool {
+func loop(c pb.StocksClient, errorLog *log.Logger) (bool, error) {
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("-> ")
@@ -84,35 +90,35 @@ func loop(c pb.StocksClient) bool {
 
 	// If error while getting line quit
 	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		return false, err
 	}
 
 	// splits the input on whitespace
 	words := strings.Fields(text)
 	if len(words) == 0 || len(words) > 2 {
-		fmt.Fprintf(os.Stderr, "Invalid input: %s\n", text)
+		errorLog.Printf("Invalid input: %s\n", text)
 	}
 
 	// as of 5/2/24 only option is get 'ticker' or q to quit
 	if len(words) == 1 {
-		if strings.ToLower(words[0]) == "q" {
-			return false
+		if strings.ToLower(words[0]) == "q" ||
+			strings.ToLower(words[0]) == "quit" {
+			return false, nil
 		} else {
-			fmt.Fprintln(os.Stderr, "Not enough arguments, please provide ticker name.")
-			return true
+			errorLog.Println("Not enough arguments, please provide ticker name.")
+			return true, nil
 		}
 	}
 
 	res, err := c.GetQuote(context.Background(), &pb.GetQuoteRequest{Symbol: strings.ToUpper(words[1])})
 
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to get ticker: %v\n", err)
-		return true
+		errorLog.Printf("failed to get ticker: %v\n", err)
+		return true, nil
 	}
 	fmt.Println(proto.MarshalTextString(res))
 
-	return true
+	return true, nil
 }
 
 // handleGetRequest
