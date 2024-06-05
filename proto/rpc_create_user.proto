@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+// import "user.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+message CreateUserRequest {
+    string firstName = 1;
+    string lastName = 2;
+}
+
+message CreateUserResponse {
+    int32 id = 1;
+}

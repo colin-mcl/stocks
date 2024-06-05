@@ -32,7 +32,7 @@ type badResponse struct {
 // Example request:
 // https://yfapi.net/v6/finance/quote?region=US&lang=en&symbols=AAPL
 func (server *Server) GetQuote(ctx context.Context, r *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
-	server.infoLog.Printf("get quote request recieved: %s", r.GetSymbol())
+	server.infoLog.Printf("get quote request recieved: %s\n", r.GetSymbol())
 
 	// Create new HTTP request and add API key to the header
 	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, r.GetSymbol()), nil)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/colin-mcl/stocks/controllers"
 	"github.com/colin-mcl/stocks/gapi"
+	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -42,7 +43,7 @@ func main() {
 
 func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error {
 
-	server, err := gapi.NewServer(db, errorLog, infoLog)
+	server, err := gapi.NewServer(&models.UserModel{DB: db}, errorLog, infoLog)
 	if err != nil {
 		return fmt.Errorf("failed to create server:%w", err)
 	}

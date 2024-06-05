@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+message User {
+    int32 id = 1;
+    string firstName = 2;
+    string lastName = 3;
+    google.protobuf.Timestamp createdAt = 4;
+}

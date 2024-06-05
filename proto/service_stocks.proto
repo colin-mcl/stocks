@@ -3,9 +3,11 @@ syntax = "proto3";
 package pb;
 
 import "rpc_get_quote.proto";
+import "rpc_create_user.proto";
 
 option go_package = "github.com/colin-mcl/stocks/pb";
 
 service Stocks {
     rpc GetQuote (GetQuoteRequest) returns (GetQuoteResponse) {}
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
 }
