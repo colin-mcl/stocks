@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -9,6 +11,7 @@ import (
 	"github.com/colin-mcl/stocks/gapi"
 	"github.com/colin-mcl/stocks/pb"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -20,13 +23,28 @@ func main() {
 	errorLog := log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLog := log.New(os.Stdout, "[INFO] ", log.Ldate|log.Ltime)
 
-	runGrpcServer(errorLog, infoLog)
+	// open mysql database connection and check for errors
+	// TODO: change this to not be hard coded
+	db, err := openDB("web:Amsterdam22!@/stocks?parseTime=true")
+
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer db.Close()
+
+	err = runGrpcServer(db, errorLog, infoLog)
+
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 }
 
-func runGrpcServer(errorLog *log.Logger, infoLog *log.Logger) {
-	server, err := gapi.NewServer(errorLog, infoLog)
+func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error {
+
+	server, err := gapi.NewServer(db, errorLog, infoLog)
 	if err != nil {
-		errorLog.Fatal("cannot create server:", err)
+		return fmt.Errorf("failed to create server:%w", err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -38,15 +56,31 @@ func runGrpcServer(errorLog *log.Logger, infoLog *log.Logger) {
 	// creates a listener to listen for requests on localhost:9090
 	listener, err := net.Listen("tcp", ":9090")
 	if err != nil {
-		errorLog.Fatal("cannot create listener:", err)
+		return fmt.Errorf("failed to create listener: %w", err)
 	}
 
 	infoLog.Printf("starting GRPC server at %s", listener.Addr().String())
 
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		errorLog.Fatal("cannot start grpc server:", err)
+		return fmt.Errorf("failed to start grpc server: %w", err)
 	}
+
+	return nil
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
 
 func runGinServer() {
