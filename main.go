@@ -11,6 +11,7 @@ import (
 	"github.com/colin-mcl/stocks/gapi"
 	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
+	"github.com/colin-mcl/stocks/util"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc"
@@ -26,7 +27,7 @@ func main() {
 
 	// open mysql database connection and check for errors
 	// TODO: change this to not be hard coded
-	db, err := openDB("web:Amsterdam22!@/stocks?parseTime=true")
+	db, err := util.OpenDB("web:Amsterdam22!@/stocks?parseTime=true")
 
 	if err != nil {
 		errorLog.Fatal(err)
@@ -68,20 +69,6 @@ func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error 
 	}
 
 	return nil
-}
-
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if err = db.Ping(); err != nil {
-		return nil, err
-	}
-
-	return db, nil
 }
 
 func runGinServer() {
