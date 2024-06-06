@@ -8,9 +8,9 @@ import (
 // Defines a user type for an individual user
 type User struct {
 	ID        int
-	firstName string
-	lastName  string
-	createdAt time.Time
+	FirstName string
+	LastName  string
+	CreatedAt time.Time
 }
 
 // Define a user model type which wraps a db connection pool
@@ -40,5 +40,17 @@ func (m *UserModel) Insert(firstName string, lastName string) (int, error) {
 
 // Returns a user with the matching ID
 func (m *UserModel) Get(id int) (*User, error) {
-	return nil, nil
+	stmt := `SELECT id, first_name, last_name, created FROM users
+	WHERE id = ?`
+
+	row := m.DB.QueryRow(stmt, id)
+
+	u := &User{}
+
+	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return u, nil
 }
