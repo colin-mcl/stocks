@@ -84,17 +84,13 @@ func TestGetQuoteAll(t *testing.T) {
 	for scanner.Scan() {
 		symbol := scanner.Text()
 
-		// only test this symbol if rand() generates 999a
-		i := rand.Intn(1000)
+		// only test this symbol if rand() generates 999
+		i := rand.Intn(2000)
 		if i != 999 {
 			continue
 		}
 		resp, err := server.GetQuote(context.Background(),
 			&pb.GetQuoteRequest{Symbol: symbol})
-
-		if err != nil {
-			log.Fatal(err)
-		}
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

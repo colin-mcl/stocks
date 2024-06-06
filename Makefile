@@ -26,4 +26,7 @@ docker-stop:
 docker-build:
 	docker build . -t stocks:latest
 
-.PHONY: proto server evans docker docker-stop docker-build
+test:
+	go test -v -cover ./...
+
+.PHONY: proto server evans docker docker-stop docker-build test
