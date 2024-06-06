@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/colin-mcl/stocks/pb"
 	"google.golang.org/grpc/codes"
@@ -35,8 +36,10 @@ func (server *Server) GetQuote(ctx context.Context, r *pb.GetQuoteRequest) (*pb.
 	server.infoLog.Printf("get quote request recieved: %s\n", r.GetSymbol())
 
 	// Create new HTTP request and add API key to the header
-	req, err := http.NewRequest("GET", fmt.Sprintf(yahooURL, r.GetSymbol()), nil)
+	req, err := http.NewRequest("GET",
+		fmt.Sprintf(yahooURL, url.QueryEscape(r.GetSymbol())), nil)
 	req.Header.Set("x-api-key", server.api_key)
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create request %s", err)
 	}

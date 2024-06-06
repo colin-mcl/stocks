@@ -23,7 +23,8 @@ const good_key = "4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD"
 
 // Tests the response of GetQuote if the server has a bad api key
 func TestGetQuoteBadKey(t *testing.T) {
-	server := &Server{api_key: "bad"}
+	server := makeDefaultServer()
+	server.api_key = "bad"
 	resp, err := server.GetQuote(context.Background(), &pb.GetQuoteRequest{Symbol: "TSLA"})
 
 	require.Nil(t, resp)
@@ -32,7 +33,7 @@ func TestGetQuoteBadKey(t *testing.T) {
 }
 
 func TestGetQuote(t *testing.T) {
-	server := &Server{api_key: good_key}
+	server := makeDefaultServer()
 
 	tests := []struct {
 		name string
@@ -77,7 +78,7 @@ func TestGetQuoteAll(t *testing.T) {
 	}
 	defer file.Close()
 
-	server := &Server{api_key: good_key}
+	server := makeDefaultServer()
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
