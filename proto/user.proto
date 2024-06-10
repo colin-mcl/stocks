@@ -8,7 +8,9 @@ option go_package = "github.com/colin-mcl/stocks/pb";
 
 message User {
     int32 id = 1;
-    string firstName = 2;
-    string lastName = 3;
-    google.protobuf.Timestamp createdAt = 4;
+    string username = 2;
+    string email = 3;
+    string firstName = 4;
+    string lastName = 5;
+    google.protobuf.Timestamp createdAt = 6;
 }

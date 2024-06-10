@@ -7,8 +7,11 @@ package pb;
 option go_package = "github.com/colin-mcl/stocks/pb";
 
 message CreateUserRequest {
-    string firstName = 1;
-    string lastName = 2;
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    string firstName = 4;
+    string lastName = 5;
 }
 
 message CreateUserResponse {
