@@ -55,3 +55,13 @@ func TestInsertUser(t *testing.T) {
 	require.True(t, exists)
 	require.Nil(t, err)
 }
+
+func TestExists(t *testing.T) {
+	exists, err := testModels.Exists(0)
+	require.Nil(t, err)
+	require.False(t, exists)
+
+	exists, err = testModels.Exists(1)
+	require.Nil(t, err)
+	require.True(t, exists)
+}
