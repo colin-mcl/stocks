@@ -96,7 +96,21 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 
 // Checks whether there exists a user with the given ID
 func (m *UserModel) Exists(id int) (bool, error) {
-	return false, nil
+	var queriedID int
+
+	stmt := `SELECT id FROM users WHERE id = ?`
+
+	err := m.DB.QueryRow(stmt, id).Scan(&queriedID)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
 }
 
 // Returns a user with the matching ID

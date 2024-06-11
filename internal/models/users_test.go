@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -26,5 +27,31 @@ func TestAuthenticateUser(t *testing.T) {
 	id, err = testModels.Authenticate("colin.mcl@gmail.com", "Password123!")
 
 	require.Equal(t, id, 1)
+	require.Nil(t, err)
+}
+
+func TestInsertUser(t *testing.T) {
+	// Inserting user with email that already exists
+	id, err := testModels.Insert("bad", "user", "badusername",
+		"colin.mcl@gmail.com", "pass")
+
+	require.Equal(t, id, -1)
+	require.NotNil(t, err)
+
+	// Check that non existant user doesn't exist
+	exists, _ := testModels.Exists(0)
+	require.False(t, exists)
+
+	// Inserting real user and check it exists
+	password := time.Now().String()
+	username := "realuser#" + password
+	email := username + "@email.com"
+	id, err = testModels.Insert("real", "user", username, email, password)
+
+	require.NotEqual(t, id, -1)
+	require.Nil(t, err)
+
+	exists, err = testModels.Exists(id)
+	require.True(t, exists)
 	require.Nil(t, err)
 }
