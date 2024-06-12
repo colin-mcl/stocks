@@ -40,7 +40,7 @@ import (
 	"github.com/colin-mcl/stocks/pb"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 var serverURL string
@@ -55,8 +55,14 @@ func main() {
 			" to your stock server address and restart the program.")
 	}
 
+	// Set up TLS credentials from ca-cert file
+	creds, err := credentials.NewClientTLSFromFile("../cert/ca-cert.pem", "")
+	if err != nil {
+		errorLog.Fatal("failed to get certificate authority file: %w", err)
+	}
+
 	// Set up connection to the grpc server
-	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		errorLog.Fatalf("failed to connect: %v", err)
 	}

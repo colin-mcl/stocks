@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -44,12 +45,21 @@ func main() {
 
 func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error {
 
+	// Instantiate our internal server with the correspoding models, db and logs
 	server, err := gapi.NewServer(&models.UserModel{DB: db}, errorLog, infoLog)
 	if err != nil {
 		return fmt.Errorf("failed to create server:%w", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	// Load server TLS certificate and key from files in cert subfolder
+	// TODO: make this an environment var
+	creds, err := credentials.NewServerTLSFromFile("cert/server-cert.pem",
+		"cert/server-key.pem")
+	if err != nil {
+		return fmt.Errorf("failed to load TLS credentinals: %w", err)
+	}
+
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
 	pb.RegisterStocksServer(grpcServer, server)
 
 	// Allows a grpc client to explore which rpc calls are available
