@@ -118,16 +118,28 @@ func (m *UserModel) Exists(id int) (bool, error) {
 }
 
 // Returns a user with the matching ID
-func (m *UserModel) Get(id int) (*User, error) {
-	stmt := `SELECT id, first_name, last_name, created FROM users
-	WHERE id = ?`
+func (m *UserModel) Get(email string) (*User, error) {
+	stmt := `SELECT id, username, email, hashed_password,
+	first_name, last_name, created_at FROM users
+	WHERE email = ?`
 
-	row := m.DB.QueryRow(stmt, id)
+	row := m.DB.QueryRow(stmt, email)
 
 	u := &User{}
 
-	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.CreatedAt)
+	err := row.Scan(
+		&u.ID,
+		&u.Username,
+		&u.Email,
+		&u.HashedPassword,
+		&u.FirstName,
+		&u.LastName,
+		&u.CreatedAt)
+
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrInvalidCredentials
+		}
 		return nil, err
 	}
 

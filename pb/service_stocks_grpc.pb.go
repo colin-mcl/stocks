@@ -25,6 +25,7 @@ type StocksClient interface {
 	GetQuote(ctx context.Context, in *GetQuoteRequest, opts ...grpc.CallOption) (*GetQuoteResponse, error)
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
+	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 }
 
 type stocksClient struct {
@@ -62,6 +63,15 @@ func (c *stocksClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...
 	return out, nil
 }
 
+func (c *stocksClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error) {
+	out := new(LoginUserResponse)
+	err := c.cc.Invoke(ctx, "/pb.Stocks/LoginUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // StocksServer is the server API for Stocks service.
 // All implementations must embed UnimplementedStocksServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type StocksServer interface {
 	GetQuote(context.Context, *GetQuoteRequest) (*GetQuoteResponse, error)
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
+	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	mustEmbedUnimplementedStocksServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedStocksServer) CreateUser(context.Context, *CreateUserRequest)
 }
 func (UnimplementedStocksServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedStocksServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
 }
 func (UnimplementedStocksServer) mustEmbedUnimplementedStocksServer() {}
 
@@ -152,6 +166,24 @@ func _Stocks_GetUser_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Stocks_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StocksServer).LoginUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Stocks/LoginUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StocksServer).LoginUser(ctx, req.(*LoginUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Stocks_ServiceDesc is the grpc.ServiceDesc for Stocks service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var Stocks_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUser",
 			Handler:    _Stocks_GetUser_Handler,
+		},
+		{
+			MethodName: "LoginUser",
+			Handler:    _Stocks_LoginUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

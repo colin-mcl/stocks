@@ -10,6 +10,8 @@ import (
 func convertUser(user *models.User) *pb.User {
 	return &pb.User{
 		Id:        int32(user.ID),
+		Username:  user.Username,
+		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		CreatedAt: timestamppb.New(user.CreatedAt),
