@@ -56,7 +56,7 @@ func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error 
 	creds, err := credentials.NewServerTLSFromFile("cert/server-cert.pem",
 		"cert/server-key.pem")
 	if err != nil {
-		return fmt.Errorf("failed to load TLS credentinals: %v", err)
+		return fmt.Errorf("failed to load TLS credentinals: %w", err)
 	}
 
 	grpcServer := grpc.NewServer(grpc.Creds(creds))

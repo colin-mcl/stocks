@@ -7,6 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang/protobuf v1.5.4
 	github.com/stretchr/testify v1.8.3
+	golang.org/x/crypto v0.24.0
 	google.golang.org/grpc v1.63.2
 	google.golang.org/protobuf v1.34.1
 )
@@ -33,7 +34,6 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
