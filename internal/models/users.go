@@ -3,12 +3,16 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrAlreadyExists      error = errors.New("error: user already exists")
+	ErrInvalidCredentials error = errors.New("error: invalid credentials")
 )
 
 // Defines a user type for an individual user
@@ -51,7 +55,7 @@ func (m *UserModel) Insert(firstName, lastName, username, email, password string
 		if errors.As(err, &mySQLError) {
 			if mySQLError.Number == 1062 &&
 				strings.Contains(mySQLError.Message, "users_uc_email") {
-				return -1, fmt.Errorf("Error: duplicate email, %w", err)
+				return -1, ErrAlreadyExists
 			}
 		}
 
@@ -76,7 +80,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	err := m.DB.QueryRow(stmt, email).Scan(&id, &hashedPassword)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return -1, fmt.Errorf("Error: invalid credentials")
+			return -1, ErrInvalidCredentials
 		}
 
 		return -1, err
@@ -85,7 +89,7 @@ func (m *UserModel) Authenticate(email, password string) (int, error) {
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return -1, fmt.Errorf("Error: invalid credentials")
+			return -1, ErrInvalidCredentials
 		}
 
 		return -1, err

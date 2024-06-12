@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -13,15 +12,15 @@ func TestAuthenticateUser(t *testing.T) {
 	id, err := testModels.Authenticate("fakeEmail", "badPassword")
 
 	require.Equal(t, id, -1)
-	require.NotNil(t, err)
-	require.Equal(t, err, fmt.Errorf("Error: invalid credentials"))
+	require.Error(t, err)
+	require.EqualError(t, err, ErrInvalidCredentials.Error())
 
 	// Test an existing user with the wrong password
 	id, err = testModels.Authenticate("colin.mcl@gmail.com", "blah")
 
 	require.Equal(t, id, -1)
-	require.NotNil(t, err)
-	require.Equal(t, err, fmt.Errorf("Error: invalid credentials"))
+	require.Error(t, err)
+	require.EqualError(t, err, ErrInvalidCredentials.Error())
 
 	// Test an existing user with the correct password
 	id, err = testModels.Authenticate("colin.mcl@gmail.com", "Password123!")
@@ -36,7 +35,7 @@ func TestInsertUser(t *testing.T) {
 		"colin.mcl@gmail.com", "pass")
 
 	require.Equal(t, id, -1)
-	require.NotNil(t, err)
+	require.Error(t, err)
 
 	// Check that non existant user doesn't exist
 	exists, _ := testModels.Exists(0)

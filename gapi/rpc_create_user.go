@@ -2,7 +2,9 @@ package gapi
 
 import (
 	"context"
+	"errors"
 
+	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,6 +22,9 @@ func (server *Server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (
 	)
 
 	if err != nil {
+		if errors.Is(err, models.ErrAlreadyExists) {
+			return nil, status.Errorf(codes.AlreadyExists, "user already exists: %s", err)
+		}
 		return nil, status.Errorf(codes.Internal, "failed to create new user %s", err)
 	}
 

@@ -14,7 +14,7 @@ stocks_cli:
 	cd ..
 
 evans:
-	evans --host 127.0.0.1 --port 9090 -r repl
+	evans --host 127.0.0.1 --port 9090 -r repl -t --cacert cert/ca-cert.pem
 
 docker:
 	docker run -p 9090:9090 --name stocks-container -e STOCKS_API_KEY=4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD stocks
