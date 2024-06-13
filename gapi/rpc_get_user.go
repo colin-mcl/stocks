@@ -11,6 +11,11 @@ import (
 func (server *Server) GetUser(ctx context.Context, r *pb.GetUserRequest) (*pb.GetUserResponse, error) {
 	server.infoLog.Printf("get user request received: email = %s\n", r.GetEmail())
 
+	_, err := server.authorizeUser(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthorized")
+	}
+
 	u, err := server.users.Get(r.GetEmail())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal,
