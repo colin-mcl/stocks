@@ -27,7 +27,6 @@ Usage is as follows:
 
 import (
 	"bufio"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -37,8 +36,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/colin-mcl/stocks/pb"
-	"github.com/golang/protobuf/proto"
+	"github.com/colin-mcl/stocks/client"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -49,6 +47,7 @@ func main() {
 	// gets the server URL to make requests or rpcs to
 	serverURL = os.Getenv("STOCKS_URL")
 	errorLog := log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLog := log.New(os.Stderr, "[INFO] ", log.Ldate|log.Ltime)
 
 	if serverURL == "" {
 		errorLog.Fatal("Please set the STOCKS_URL environment variable" +
@@ -68,7 +67,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := pb.NewStocksClient(conn)
+	c := client.NewStocksClient(conn, errorLog, infoLog)
 
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
@@ -86,7 +85,7 @@ func main() {
 
 }
 
-func loop(c pb.StocksClient, errorLog *log.Logger) (bool, error) {
+func loop(client client.StocksClient, errorLog *log.Logger) (bool, error) {
 
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("-> ")
@@ -116,14 +115,7 @@ func loop(c pb.StocksClient, errorLog *log.Logger) (bool, error) {
 		}
 	}
 
-	res, err := c.GetQuote(context.Background(), &pb.GetQuoteRequest{Symbol: strings.ToUpper(words[1])})
-
-	if err != nil {
-		errorLog.Printf("failed to get ticker: %v\n", err)
-		return true, nil
-	}
-	fmt.Println(proto.MarshalTextString(res))
-
+	client.GetQuote(words[1])
 	return true, nil
 }
 
