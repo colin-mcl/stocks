@@ -5,7 +5,7 @@ proto:
 	proto/*.proto
 
 server:
-	export STOCKS_API_KEY=4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD
+	export STOCKS_API_KEY=JpzjMLsDTy47kVDb1ujQx5ks3CetiVLn4bb7KHjH
 	go run main.go
 
 stocks_cli:

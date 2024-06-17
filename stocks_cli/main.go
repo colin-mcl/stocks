@@ -34,7 +34,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/colin-mcl/stocks/client"
 	"google.golang.org/grpc"
@@ -67,56 +66,14 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := client.NewStocksClient(conn, errorLog, infoLog)
+	cmdclient := newCmdClient(client.NewStocksClient(conn),
+		errorLog, infoLog, bufio.NewReader(os.Stdin))
 
-	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
-	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
-	fmt.Println("-----------------------------------------------------------------------------------------------")
-
-	running := true
-	// infinite loop for user input
-	for running {
-		running, err = loop(c, errorLog)
-
-		if err != nil {
-			errorLog.Fatal(err)
-		}
-	}
-
-}
-
-func loop(client client.StocksClient, errorLog *log.Logger) (bool, error) {
-
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("-> ")
-
-	// Get the next input line from stdin
-	text, err := reader.ReadString('\n')
-
-	// If error while getting line quit
+	err = cmdclient.run()
 	if err != nil {
-		return false, err
+		errorLog.Fatal(err)
 	}
 
-	// splits the input on whitespace
-	words := strings.Fields(text)
-	if len(words) == 0 || len(words) > 2 {
-		errorLog.Printf("Invalid input: %s\n", text)
-	}
-
-	// as of 5/2/24 only option is get 'ticker' or q to quit
-	if len(words) == 1 {
-		if strings.ToLower(words[0]) == "q" ||
-			strings.ToLower(words[0]) == "quit" {
-			return false, nil
-		} else {
-			errorLog.Println("Not enough arguments, please provide ticker name.")
-			return true, nil
-		}
-	}
-
-	client.GetQuote(words[1])
-	return true, nil
 }
 
 // handleGetRequest

@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -34,25 +33,17 @@ import (
 type StocksClient struct {
 	// Internal StocksClient service
 	service pb.StocksClient
-
-	errorLog *log.Logger
-	infoLog  *log.Logger
 }
 
 // Creates a Stocks client with the provided grpc client connection
-func NewStocksClient(
-	conn *grpc.ClientConn,
-	errLog *log.Logger,
-	infoLog *log.Logger) *StocksClient {
+func NewStocksClient(conn *grpc.ClientConn) *StocksClient {
 
 	return &StocksClient{
-		service:  pb.NewStocksClient(conn),
-		errorLog: errLog,
-		infoLog:  infoLog}
+		service: pb.NewStocksClient(conn)}
 }
 
 // Gets and prints a simple stock quote
-func (stocksClient *StocksClient) GetQuote(symbol string) {
+func (stocksClient *StocksClient) GetQuote(symbol string) error {
 	// Create RPC request
 	req := &pb.GetQuoteRequest{Symbol: strings.ToUpper(symbol)}
 
@@ -61,9 +52,35 @@ func (stocksClient *StocksClient) GetQuote(symbol string) {
 
 	resp, err := stocksClient.service.GetQuote(ctx, req)
 	if err != nil {
-		stocksClient.errorLog.Printf("failed to get quote for symbol: %s\n", symbol)
+		return err
 	}
 
 	fmt.Println(protojson.Format(resp))
+	return nil
+}
 
+func (stocksClient *StocksClient) CreateUser(
+	firstName string,
+	lastName string,
+	username string,
+	email string,
+	password string) (int, error) {
+
+	req := &pb.CreateUserRequest{
+		FirstName: firstName,
+		LastName:  lastName,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := stocksClient.service.CreateUser(ctx, req)
+	if err != nil {
+		return -1, err
+	}
+
+	return int(resp.GetId()), nil
 }
