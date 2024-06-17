@@ -84,3 +84,19 @@ func (stocksClient *StocksClient) CreateUser(
 
 	return int(resp.GetId()), nil
 }
+
+// LoginUser calls the LoginUser service on the stocks service with the
+// email and password and returns the access token if the login is suceessful
+func (stocksClient *StocksClient) LoginUser(email string, password string) (string, error) {
+	req := &pb.LoginUserRequest{Email: email, Password: password}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := stocksClient.service.LoginUser(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.GetAccessToken(), nil
+}

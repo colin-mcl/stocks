@@ -24,6 +24,15 @@ type cmdClient struct {
 
 	// stdin reader
 	reader *bufio.Reader
+
+	user *authenticatedUser
+}
+
+// Represents an authenticated user on the stocks client
+type authenticatedUser struct {
+	email string
+
+	accessToken string
 }
 
 func newCmdClient(
@@ -36,6 +45,7 @@ func newCmdClient(
 		errorLog:     errorLog,
 		infoLog:      infoLog,
 		reader:       r,
+		user:         nil,
 	}
 }
 
@@ -61,6 +71,9 @@ func (client *cmdClient) run() error {
 
 func (client *cmdClient) loop() (bool, error) {
 
+	if client.user != nil {
+		fmt.Printf("%s ", client.user.email)
+	}
 	fmt.Print("-> ")
 
 	// Get the next input line from stdin
@@ -91,22 +104,66 @@ func (client *cmdClient) loop() (bool, error) {
 		if err != nil {
 			return false, err
 		}
+	case "login":
+		err := client.login()
+		if err != nil {
+			return false, err
+		}
 	default:
 		client.errorLog.Println("Invalid command, see reference for command")
 	}
 
-	// if len(words) == 1 {
-	// 	if strings.ToLower(words[0]) == "q" ||
-	// 		strings.ToLower(words[0]) == "quit" {
-	// 		return false, nil
-	// 	} else {
-	// 		errorLog.Println("Not enough arguments, please provide ticker name.")
-	// 		return true, nil
-	// 	}
-	// }
-
-	// client.GetQuote(words[1])
 	return true, nil
+}
+
+func (client *cmdClient) login() error {
+	if client.user != nil {
+		client.errorLog.Print("Error: already logged in, to log in again please log out first")
+		return nil
+	}
+
+	fmt.Printf("Enter email:\n-> ")
+	text, err := client.reader.ReadString('\n')
+	if err != nil {
+		return nil
+	}
+
+	words := strings.Fields(text)
+	if len(words) != 1 {
+		client.errorLog.Print("Error: too many arguments")
+		return nil
+	}
+
+	email := words[0]
+
+	fmt.Printf("Enter password:\n-> ")
+	text, err = client.reader.ReadString('\n')
+	if err != nil {
+		return err
+	}
+
+	words = strings.Fields(text)
+	if len(words) != 1 {
+		client.errorLog.Print("Error: too many arguments")
+		return nil
+	}
+
+	password := words[0]
+
+	token, err := client.stocksClient.LoginUser(email, password)
+
+	if err != nil {
+		st, ok := status.FromError(err)
+		if ok && st.Code() == codes.Unauthenticated {
+			client.errorLog.Print("Invalid credentials")
+			return nil
+		}
+		return err
+	}
+
+	client.user = &authenticatedUser{email: email, accessToken: token}
+
+	return nil
 }
 
 // createUser gets the appropriate fields from reader to create a user on
