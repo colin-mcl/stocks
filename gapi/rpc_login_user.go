@@ -14,6 +14,8 @@ import (
 )
 
 func (server *Server) LoginUser(ctx context.Context, r *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
+	server.infoLog.Printf("login request received: %s", r.GetEmail())
+
 	// Get the user and check if it exists
 	user, err := server.users.Get(r.GetEmail())
 

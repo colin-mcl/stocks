@@ -8,6 +8,7 @@ import (
 
 	"github.com/colin-mcl/stocks/pb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -99,4 +100,19 @@ func (stocksClient *StocksClient) LoginUser(email string, password string) (stri
 	}
 
 	return resp.GetAccessToken(), nil
+}
+
+func (stocksClient *StocksClient) GetUser(email, accessToken string) (*pb.User, error) {
+	req := &pb.GetUserRequest{Email: email}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", accessToken)
+
+	resp, err := stocksClient.service.GetUser(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.GetUser(), nil
 }

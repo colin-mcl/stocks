@@ -25,7 +25,8 @@ type cmdClient struct {
 	// stdin reader
 	reader *bufio.Reader
 
-	user *authenticatedUser
+	user    *authenticatedUser
+	running bool
 }
 
 // Represents an authenticated user on the stocks client
@@ -51,25 +52,21 @@ func newCmdClient(
 
 func (client *cmdClient) run() error {
 
+	client.running = true
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
 	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
-	running := true
-	var err error
+	var err error = nil
 	// infinite loop for user input
-	for running {
-		running, err = client.loop()
-
-		if err != nil {
-			return err
-		}
+	for err == nil && client.running {
+		err = client.loop()
 	}
 
-	return nil
+	return err
 }
 
-func (client *cmdClient) loop() (bool, error) {
+func (client *cmdClient) loop() error {
 
 	if client.user != nil {
 		fmt.Printf("%s ", client.user.email)
@@ -81,7 +78,7 @@ func (client *cmdClient) loop() (bool, error) {
 
 	// If error while getting line quit
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	// splits the input on whitespace
@@ -93,27 +90,43 @@ func (client *cmdClient) loop() (bool, error) {
 	// as of 5/2/24 only option is get 'ticker' or q to quit
 	switch strings.ToLower(words[0]) {
 	case "quit":
-		return false, nil
+		client.running = false
 	case "get":
-		err := client.stocksClient.GetQuote(words[1])
-		if err != nil {
-			return false, err
-		}
+		err = client.stocksClient.GetQuote(words[1])
 	case "create":
-		err := client.createUser()
-		if err != nil {
-			return false, err
-		}
+		err = client.createUser()
 	case "login":
-		err := client.login()
-		if err != nil {
-			return false, err
-		}
+		err = client.login()
+	case "user":
+		err = client.getUser()
 	default:
 		client.errorLog.Println("Invalid command, see reference for command")
 	}
 
-	return true, nil
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (client *cmdClient) getUser() error {
+	if client.user == nil {
+		client.errorLog.Printf("Error: must be logged in to get user info")
+		return nil
+	}
+
+	user, err := client.stocksClient.GetUser(client.user.email, client.user.accessToken)
+	if err != nil {
+		st, ok := status.FromError(err)
+		if ok && st.Code() == codes.Unauthenticated {
+			client.errorLog.Print(err)
+			return nil
+		}
+		return err
+	}
+
+	fmt.Println(user.String())
+	return nil
 }
 
 func (client *cmdClient) login() error {
