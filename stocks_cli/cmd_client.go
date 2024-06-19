@@ -1,5 +1,35 @@
 package main
 
+/* cmd_client.go
+
+Contains implementation for the private cmdClient struct which wraps all
+available commands and implementation details for the command line interface.
+
+Supported commands:
+
+	To get a quote for any stock symbol (e.g. TSLA, AAPL) and print in formatted
+	form
+		-> get 'symbol'
+
+	To create a user account which can be used to login and see portfolios
+   		-> create
+
+	To login to a created user account and see your portfolio
+		-> login
+
+	To get information on the current, LOGGED IN, user
+		-> user
+
+	To logout of the current user account
+		-> logout
+
+	To quit the program
+		-> quit
+
+	TODO: add these to README
+	More commands to come...
+*/
+
 import (
 	"bufio"
 	"fmt"
@@ -13,10 +43,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// cmd_client contains a command client struct which wraps all of the
-// required fields to run an interactive command line interface with the
-// stocks client
-
+// cmdClient struct wraps the stocksClient, loggers, user and reader so that
+// simple functions can be called to perform the implemented commands
 type cmdClient struct {
 	// stocksClient for interfacing with the stocks service
 	stocksClient *client.StocksClient
@@ -52,15 +80,16 @@ func newCmdClient(
 	}
 }
 
+// Runs the command client
 func (client *cmdClient) run() error {
 
 	client.running = true
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
-	fmt.Printf("Please enter 'get' followed by the stock ticker you would like to retrieve, or enter 'q' to quit\n")
+	fmt.Printf("Please see cmd_client.go for details on accepted commands.\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
 	var err error = nil
-	// infinite loop for user input
+	// infinite loop for reading user commands
 	for err == nil && client.running {
 		err = client.loop()
 	}
@@ -68,29 +97,28 @@ func (client *cmdClient) run() error {
 	return err
 }
 
+// Loops infinitely until a fatal error occurs or the user quits
 func (client *cmdClient) loop() error {
 
+	// print current logged in user before prompt
 	if client.user != nil {
 		fmt.Printf("%s ", client.user.email)
 	}
 	fmt.Print("-> ")
 
-	// Get the next input line from stdin
 	text, err := client.reader.ReadString('\n')
-
-	// If error while getting line quit
 	if err != nil {
 		return err
 	}
 
 	// splits the input on whitespace
 	words := strings.Fields(text)
-	if len(words) == 0 || len(words) > 2 {
-		client.errorLog.Printf("Invalid input: %s\n", text)
+	if len(words) == 0 {
+		return nil
 	}
+	command := strings.ToLower(words[0])
 
-	// as of 5/2/24 only option is get 'ticker' or q to quit
-	switch strings.ToLower(words[0]) {
+	switch command {
 	case "quit":
 		client.running = false
 	case "get":
@@ -113,6 +141,8 @@ func (client *cmdClient) loop() error {
 	return nil
 }
 
+// Gets information of the current logged in user, or prints an error if no
+// user is currently logged in
 func (client *cmdClient) getUser() error {
 	if client.user == nil {
 		client.errorLog.Printf("Error: must be logged in to get user info")
@@ -133,6 +163,7 @@ func (client *cmdClient) getUser() error {
 	return nil
 }
 
+// Logs out the current user or prints an error message if no user is logged in
 func (client *cmdClient) logout() {
 	if client.user != nil {
 		client.user = nil
@@ -141,6 +172,8 @@ func (client *cmdClient) logout() {
 	}
 }
 
+// Logs into a user account by prompting for email and password and making
+// request to the stocksClient
 func (client *cmdClient) login() error {
 	if client.user != nil {
 		client.errorLog.Print("Error: already logged in, to log in again please log out first")
@@ -154,21 +187,21 @@ func (client *cmdClient) login() error {
 	}
 
 	words := strings.Fields(text)
-	if len(words) != 1 {
-		client.errorLog.Print("Error: too many arguments")
+	if len(words) == 0 {
+		client.errorLog.Print("no email entered")
 		return nil
 	}
-
 	email := words[0]
 
+	// Get password from stdin without displaying the text
 	fmt.Printf("Enter password:\n-> ")
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return err
 	}
 
+	// authenticate user
 	token, err := client.stocksClient.LoginUser(email, string(bytePassword))
-
 	if err != nil {
 		st, ok := status.FromError(err)
 		if ok && st.Code() == codes.Unauthenticated {

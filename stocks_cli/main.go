@@ -1,28 +1,27 @@
 package main
 
-/* reader.go
+/* main.go
 
 Colin Mclaughlin, April 2024
 
 stocks project
 
-reader.go provides the main method for the interactive stocks program,
-the program can be run with go run reader.go.
+main launches the interactive command line interface of the stocks program by
+connecting to the grpc server and intializing and running a command client
+struct.
 
 It accepts the following options:
 	- N/A for now
 
 
-The following environment variables must be set:
-	- STOCKS_URL=your_stocks_serverurl
-		e.g. http://localhost:8080
+The following configurations must be in place:
+	- env variable STOCKS_URL=your_stocks_serverurl
+		e.g. http://localhost:9090
+	- TLS trusted certificates file (ca-cert.pem) must be stored in a folder
+	   named cert one level above this folder
+	TODO: change this to environment variable
 
-Usage is as follows:
-							STOCKS PROGRAM
-	Please enter 'get' followed by the stock ticker you would like to retrieve
-
-	-> get TSLA
-	...
+See cmd_client.go for documentation on commands which are accepted
 */
 
 import (
@@ -45,6 +44,8 @@ var serverURL string
 func main() {
 	// gets the server URL to make requests or rpcs to
 	serverURL = os.Getenv("STOCKS_URL")
+
+	// Create logger objects on stderr
 	errorLog := log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
 	infoLog := log.New(os.Stderr, "[INFO] ", log.Ldate|log.Ltime)
 
@@ -59,7 +60,7 @@ func main() {
 		errorLog.Fatal("failed to get certificate authority file: %w", err)
 	}
 
-	// Set up connection to the grpc server
+	// Create connection to GRPC server with TLS credentials
 	conn, err := grpc.NewClient(serverURL, grpc.WithTransportCredentials(creds))
 	if err != nil {
 		errorLog.Fatalf("failed to connect: %v", err)
@@ -69,6 +70,7 @@ func main() {
 	cmdclient := newCmdClient(client.NewStocksClient(conn),
 		errorLog, infoLog, bufio.NewReader(os.Stdin))
 
+	// Run command client and log any fatal errors
 	err = cmdclient.run()
 	if err != nil {
 		errorLog.Fatal(err)
@@ -76,6 +78,8 @@ func main() {
 
 }
 
+// NOT CURRENTLY IN USE:
+//
 // handleGetRequest
 // helper function that makes the get ticker request to the server and unmarshals
 // the json result into the result struct, returning a pointer to the struct
