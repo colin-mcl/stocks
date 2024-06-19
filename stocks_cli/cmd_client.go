@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"syscall"
 
 	"github.com/colin-mcl/stocks/client"
+	"golang.org/x/term"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -99,6 +101,8 @@ func (client *cmdClient) loop() error {
 		err = client.login()
 	case "user":
 		err = client.getUser()
+	case "logout":
+		client.logout()
 	default:
 		client.errorLog.Println("Invalid command, see reference for command")
 	}
@@ -129,6 +133,14 @@ func (client *cmdClient) getUser() error {
 	return nil
 }
 
+func (client *cmdClient) logout() {
+	if client.user != nil {
+		client.user = nil
+	} else {
+		client.errorLog.Printf("Error: attempted to log out when no user is logged in")
+	}
+}
+
 func (client *cmdClient) login() error {
 	if client.user != nil {
 		client.errorLog.Print("Error: already logged in, to log in again please log out first")
@@ -150,20 +162,12 @@ func (client *cmdClient) login() error {
 	email := words[0]
 
 	fmt.Printf("Enter password:\n-> ")
-	text, err = client.reader.ReadString('\n')
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return err
 	}
 
-	words = strings.Fields(text)
-	if len(words) != 1 {
-		client.errorLog.Print("Error: too many arguments")
-		return nil
-	}
-
-	password := words[0]
-
-	token, err := client.stocksClient.LoginUser(email, password)
+	token, err := client.stocksClient.LoginUser(email, string(bytePassword))
 
 	if err != nil {
 		st, ok := status.FromError(err)

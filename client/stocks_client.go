@@ -16,19 +16,9 @@ import (
 
 // GetQuote: requires NO authorization, users do not need to be logged in
 // LoginUser: user passes their email and password and is returned an access
-//			  token which is stored WHERE???
+//			  token
 //
-// AuthorizedRPC: either stored access token is added to the context or
-//				   LoginUser is called to get the access token before the
-//				   authorizedRPC is called
-
-// Idea:
-// map [string] string authorizedUsers: email -> accessToken
-// if the user is not found in the authorizedUsers, tell them to call login
-// and try again
 //
-// on Login: add user email and access token to the map, display users
-// 	   		 email on the terminal as visual display
 
 // StocksClient provides a simple wrapper for the stocks service rpcs
 type StocksClient struct {
