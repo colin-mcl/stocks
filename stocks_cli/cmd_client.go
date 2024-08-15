@@ -6,6 +6,8 @@ Contains implementation for the private cmdClient struct which wraps all
 available commands and implementation details for the command line interface.
 
 Supported commands:
+	To see the list of support commands
+	    -> help
 
 	To get a quote for any stock symbol (e.g. TSLA, AAPL) and print in formatted
 	form
@@ -85,7 +87,7 @@ func (client *cmdClient) run() error {
 
 	client.running = true
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
-	fmt.Printf("Please see cmd_client.go for details on accepted commands.\n")
+	fmt.Printf("Run `help` to see available commands\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
 	var err error = nil
@@ -95,6 +97,32 @@ func (client *cmdClient) run() error {
 	}
 
 	return err
+}
+
+func (client *cmdClient) help() {
+	fmt.Println(`
+***** COMMANDS ******
+To see the list of support commands
+  -> help
+
+To get a quote for any stock symbol (e.g. TSLA, AAPL) and print in formatted
+form
+  -> get 'symbol'
+
+To create a user account which can be used to login and see portfolios
+  -> create
+
+To login to a created user account and see your portfolio
+  -> login
+
+To get information on the current, LOGGED IN, user
+  -> user
+
+To logout of the current user account
+  -> logout
+
+To quit the program
+  -> quit`)
 }
 
 // Loops infinitely until a fatal error occurs or the user quits
@@ -119,6 +147,8 @@ func (client *cmdClient) loop() error {
 	command := strings.ToLower(words[0])
 
 	switch command {
+	case "help":
+		client.help()
 	case "quit":
 		client.running = false
 	case "get":
@@ -180,7 +210,7 @@ func (client *cmdClient) login() error {
 		return nil
 	}
 
-	fmt.Printf("Enter email:\n-> ")
+	fmt.Printf("Enter email: ")
 	text, err := client.reader.ReadString('\n')
 	if err != nil {
 		return nil
@@ -194,7 +224,7 @@ func (client *cmdClient) login() error {
 	email := words[0]
 
 	// Get password from stdin without displaying the text
-	fmt.Printf("Enter password:\n-> ")
+	fmt.Printf("Enter password: ")
 	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return err
@@ -212,7 +242,7 @@ func (client *cmdClient) login() error {
 	}
 
 	client.user = &authenticatedUser{email: email, accessToken: token}
-
+	fmt.Println()
 	return nil
 }
 
