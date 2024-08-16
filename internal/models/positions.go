@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 )
 
@@ -68,4 +69,43 @@ func (m *PositionModel) Get(id int) (*Position, error) {
 	}
 
 	return p, nil
+}
+
+// Given a valid stock symbol and user in the users database, returns a list
+// of all positions of that stock held by owner
+func (m *PositionModel) GetStock(symbol string, owner int) ([]*Position, error) {
+	stmt := `SELECT * FROM positions WHERE symbol = ? AND heldBy = ?`
+
+	rows, err := m.DB.Query(stmt, strings.ToUpper(symbol), owner)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var stocks []*Position
+
+	for rows.Next() {
+		p := &Position{}
+
+		err := rows.Scan(
+			&p.ID,
+			&p.symbol,
+			&p.heldBy,
+			&p.purchasedAt,
+			&p.purchasePrice,
+			&p.qty)
+
+		if err != nil {
+			return nil, err
+		}
+
+		stocks = append(stocks, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return stocks, nil
+
 }

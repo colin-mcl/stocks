@@ -49,3 +49,24 @@ func TestGetPosition(t *testing.T) {
 	assert.WithinDuration(t, p.purchasedAt, purchasedAt, time.Second)
 	assert.Equal(t, p.qty, qty)
 }
+
+func TestGetStocks(t *testing.T) {
+	stocks, err := positions.GetStock("fake", 11)
+
+	assert.Empty(t, stocks)
+	assert.NoError(t, err)
+
+	stocks, err = positions.GetStock("tsla", 0)
+	assert.Empty(t, stocks)
+	assert.NoError(t, err)
+
+	stocks, err = positions.GetStock("tsla", 11)
+	assert.NotEmpty(t, stocks)
+	assert.NoError(t, err)
+
+	for _, s := range stocks {
+		assert.Equal(t, s.symbol, "TSLA")
+		assert.Equal(t, s.heldBy, 11)
+		assert.Positive(t, s.ID)
+	}
+}
