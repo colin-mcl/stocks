@@ -8,13 +8,15 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var testModels *UserModel
+var users *UserModel
+var positions *PositionModel
 
 // Runs all *_test.go files found in the package
 func TestMain(m *testing.M) {
-	testDB, err := sql.Open("mysql", "web:Amsterdam22!@/stocks?parseTime=true")
+	testDB, err := sql.Open("mysql", "web:Amsterdam22!@/stocks?parseTime=true&loc=America%2FNew_York")
 
-	testModels = &UserModel{DB: testDB}
+	users = &UserModel{DB: testDB}
+	positions = &PositionModel{DB: testDB}
 	if err != nil {
 		panic(err)
 	}

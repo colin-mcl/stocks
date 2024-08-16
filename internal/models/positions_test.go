@@ -1,0 +1,51 @@
+package models
+
+import (
+	"database/sql"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestInsertPosition(t *testing.T) {
+	symbol := "TSLA"
+	heldBy := 11
+	qty := 2.5
+	purchasePrice := 210.1
+	purchasedAt := time.Now()
+
+	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
+
+	assert.NoError(t, err)
+	assert.NotEqual(t, id, -1)
+	assert.Positive(t, id)
+}
+
+func TestGetPosition(t *testing.T) {
+	symbol := "TSLA"
+	heldBy := 11
+	qty := 2.5
+	purchasePrice := 210.1
+	purchasedAt := time.Now()
+
+	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
+
+	assert.NoError(t, err)
+	assert.NotEqual(t, id, -1)
+	assert.Positive(t, id)
+
+	p, err := positions.Get(-1)
+	assert.EqualError(t, err, sql.ErrNoRows.Error())
+	assert.Nil(t, p)
+
+	p, err = positions.Get(id)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, p)
+	assert.Equal(t, p.symbol, symbol)
+	assert.Equal(t, p.heldBy, heldBy)
+	assert.Equal(t, p.purchasePrice, purchasePrice)
+	assert.WithinDuration(t, p.purchasedAt, purchasedAt, time.Second)
+	assert.Equal(t, p.qty, qty)
+}
