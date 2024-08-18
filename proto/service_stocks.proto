@@ -6,6 +6,7 @@ import "rpc_get_quote.proto";
 import "rpc_create_user.proto";
 import "rpc_get_user.proto";
 import "rpc_login_user.proto";
+import "rpc_create_position.proto";
 import "rpc_get_position.proto";
 
 
@@ -16,5 +17,6 @@ service Stocks {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
     rpc GetUser (GetUserRequest) returns (GetUserResponse) {}
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {}
+    rpc CreatePosition (CreatePositionRequest) returns (CreatePositionResponse) {}
     rpc GetPosition (GetPositionRequest) returns (GetPositionResponse) {}
 }

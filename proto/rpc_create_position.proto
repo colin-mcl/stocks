@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+// Currently, there is no authorization involved in creating/getting positions,
+// so any logged in user can create or view positions under any ID
+// this is a flaw but the implementation of authorization is beyond the current
+// scope of the project
+message CreatePositionRequest {
+    string symbol = 1;
+    int32 heldBy = 2;
+    google.protobuf.Timestamp purchasedAt = 4;
+    double purchasePrice = 5;
+    double qty = 6;
+}
+
+message CreatePositionResponse {
+    int32 id = 1;
+}

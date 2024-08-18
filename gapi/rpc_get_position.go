@@ -10,7 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) GetPosition(ctx context.Context, r *pb.GetPositionRequest) (*pb.GetPositionResponse, error) {
+func (server *Server) GetPosition(ctx context.Context,
+	r *pb.GetPositionRequest) (*pb.GetPositionResponse, error) {
 	server.infoLog.Printf("get position request received: %d", r.GetId())
 
 	_, err := server.authenticateUser(ctx)

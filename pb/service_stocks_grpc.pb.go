@@ -26,6 +26,7 @@ type StocksClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
+	CreatePosition(ctx context.Context, in *CreatePositionRequest, opts ...grpc.CallOption) (*CreatePositionResponse, error)
 	GetPosition(ctx context.Context, in *GetPositionRequest, opts ...grpc.CallOption) (*GetPositionResponse, error)
 }
 
@@ -73,6 +74,15 @@ func (c *stocksClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts
 	return out, nil
 }
 
+func (c *stocksClient) CreatePosition(ctx context.Context, in *CreatePositionRequest, opts ...grpc.CallOption) (*CreatePositionResponse, error) {
+	out := new(CreatePositionResponse)
+	err := c.cc.Invoke(ctx, "/pb.Stocks/CreatePosition", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *stocksClient) GetPosition(ctx context.Context, in *GetPositionRequest, opts ...grpc.CallOption) (*GetPositionResponse, error) {
 	out := new(GetPositionResponse)
 	err := c.cc.Invoke(ctx, "/pb.Stocks/GetPosition", in, out, opts...)
@@ -90,6 +100,7 @@ type StocksServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
+	CreatePosition(context.Context, *CreatePositionRequest) (*CreatePositionResponse, error)
 	GetPosition(context.Context, *GetPositionRequest) (*GetPositionResponse, error)
 	mustEmbedUnimplementedStocksServer()
 }
@@ -109,6 +120,9 @@ func (UnimplementedStocksServer) GetUser(context.Context, *GetUserRequest) (*Get
 }
 func (UnimplementedStocksServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
+}
+func (UnimplementedStocksServer) CreatePosition(context.Context, *CreatePositionRequest) (*CreatePositionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePosition not implemented")
 }
 func (UnimplementedStocksServer) GetPosition(context.Context, *GetPositionRequest) (*GetPositionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPosition not implemented")
@@ -198,6 +212,24 @@ func _Stocks_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Stocks_CreatePosition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePositionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StocksServer).CreatePosition(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.Stocks/CreatePosition",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StocksServer).CreatePosition(ctx, req.(*CreatePositionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Stocks_GetPosition_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetPositionRequest)
 	if err := dec(in); err != nil {
@@ -238,6 +270,10 @@ var Stocks_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginUser",
 			Handler:    _Stocks_LoginUser_Handler,
+		},
+		{
+			MethodName: "CreatePosition",
+			Handler:    _Stocks_CreatePosition_Handler,
 		},
 		{
 			MethodName: "GetPosition",
