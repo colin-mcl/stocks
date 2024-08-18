@@ -25,5 +25,6 @@ func convertPosition(p *models.Position) *pb.Position {
 		HeldBy:        int32(p.HeldBy),
 		PurchasedAt:   timestamppb.New(p.PurchasedAt),
 		PurchasePrice: p.PurchasePrice,
+		Qty:           p.Qty,
 	}
 }
