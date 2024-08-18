@@ -17,7 +17,7 @@ func (server *Server) GetPosition(ctx context.Context,
 	_, err := server.authenticateUser(ctx)
 
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthorized: ", err.Error())
+		return nil, status.Errorf(codes.Unauthenticated, "unauthorized: %s", err.Error())
 	}
 
 	p, err := server.positions.Get(int(r.GetId()))
@@ -25,7 +25,7 @@ func (server *Server) GetPosition(ctx context.Context,
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, status.Errorf(codes.NotFound, "no position with id=%d found", r.GetId())
 		} else {
-			return nil, status.Errorf(codes.Internal, err.Error())
+			return nil, status.Errorf(codes.Internal, "%s", err.Error())
 		}
 	}
 

@@ -58,7 +58,6 @@ func NewServer(
 		errorLog:   errorLog,
 		infoLog:    infoLog,
 	}
-	// server.api_key = "4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD"
 
 	return server, nil
 }
@@ -75,10 +74,11 @@ func makeDefaultServer() *Server {
 	}
 
 	server := &Server{
-		api_key:    "4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD",
+		api_key:    os.Getenv("STOCKS_API_KEY"),
 		infoLog:    log.New(os.Stdout, "INFO ", log.Ldate),
 		errorLog:   log.New(os.Stderr, "ERROR ", log.Ldate),
 		users:      &models.UserModel{DB: db},
+		positions:  &models.PositionModel{DB: db},
 		tokenMaker: maker,
 	}
 

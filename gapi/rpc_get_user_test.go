@@ -11,12 +11,15 @@ import (
 func TestGetUser(t *testing.T) {
 	server := makeDefaultServer()
 
-	resp, err := server.GetUser(context.Background(), &pb.GetUserRequest{Id: 0})
+	resp, err := server.GetUser(context.Background(), &pb.GetUserRequest{
+		Email: "NON-EXISTANT",
+	})
 
 	require.Nil(t, resp)
 	require.Error(t, err)
 
-	resp, err = server.GetUser(context.Background(), &pb.GetUserRequest{Id: 1})
+	resp, err = server.GetUser(context.Background(), &pb.GetUserRequest{
+		Email: "colin.mclaughlin02@gmail.com"})
 
 	require.NotNil(t, resp)
 	require.Nil(t, err)

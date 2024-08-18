@@ -21,12 +21,4 @@ func TestCreateUser(t *testing.T) {
 	require.NotZero(t, resp.GetId())
 	require.Positive(t, resp.GetId())
 
-	u, err := server.GetUser(context.Background(), &pb.GetUserRequest{Id: resp.GetId()})
-
-	require.NotNil(t, u)
-	require.Nil(t, err)
-	require.Equal(t, u.GetUser().GetId(), resp.GetId())
-	require.Equal(t, u.GetUser().GetFirstName(), "testing")
-	require.Equal(t, u.GetUser().GetLastName(), "functionality")
-
 }

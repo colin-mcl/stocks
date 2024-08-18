@@ -15,7 +15,7 @@ func (server *Server) CreatePosition(ctx context.Context,
 
 	_, err := server.authenticateUser(ctx)
 	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "unauthorized: ", err.Error())
+		return nil, status.Errorf(codes.Unauthenticated, "unauthorized: %s", err.Error())
 	}
 
 	id, err := server.positions.Insert(
