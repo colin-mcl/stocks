@@ -9,11 +9,11 @@ import (
 // Defines one position held by a user
 type Position struct {
 	ID            int
-	symbol        string
-	heldBy        int
-	purchasedAt   time.Time
-	purchasePrice float64
-	qty           float64
+	Symbol        string
+	HeldBy        int
+	PurchasedAt   time.Time
+	PurchasePrice float64
+	Qty           float64
 }
 
 // Define a position model which wraps a db connection
@@ -58,11 +58,11 @@ func (m *PositionModel) Get(id int) (*Position, error) {
 
 	err := row.Scan(
 		&p.ID,
-		&p.symbol,
-		&p.heldBy,
-		&p.purchasedAt,
-		&p.purchasePrice,
-		&p.qty)
+		&p.Symbol,
+		&p.HeldBy,
+		&p.PurchasedAt,
+		&p.PurchasePrice,
+		&p.Qty)
 
 	if err != nil {
 		return nil, err
@@ -89,11 +89,11 @@ func (m *PositionModel) GetStock(symbol string, owner int) ([]*Position, error) 
 
 		err := rows.Scan(
 			&p.ID,
-			&p.symbol,
-			&p.heldBy,
-			&p.purchasedAt,
-			&p.purchasePrice,
-			&p.qty)
+			&p.Symbol,
+			&p.HeldBy,
+			&p.PurchasedAt,
+			&p.PurchasePrice,
+			&p.Qty)
 
 		if err != nil {
 			return nil, err

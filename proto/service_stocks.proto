@@ -6,6 +6,7 @@ import "rpc_get_quote.proto";
 import "rpc_create_user.proto";
 import "rpc_get_user.proto";
 import "rpc_login_user.proto";
+import "rpc_get_position.proto";
 
 
 option go_package = "github.com/colin-mcl/stocks/pb";
@@ -15,4 +16,5 @@ service Stocks {
     rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
     rpc GetUser (GetUserRequest) returns (GetUserResponse) {}
     rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {}
+    rpc GetPosition (GetPositionRequest) returns (GetPositionResponse) {}
 }

@@ -18,8 +18,11 @@ type Server struct {
 	// Allows forwards compatibility as the unimplemented server can accept all gRPC requests before they are implemented
 	pb.UnimplementedStocksServer
 
-	// Allows the user  objects to be available on the GRPC server
+	// Allows the user objects to be available on the GRPC server
 	users *models.UserModel
+
+	// Allows the position objects to be available on the GRPC server
+	positions *models.PositionModel
 
 	// TokenMaker for making and verifying user authorization tokens
 	tokenMaker token.Maker
@@ -49,6 +52,7 @@ func NewServer(
 
 	server := &Server{
 		users:      &models.UserModel{DB: db},
+		positions:  &models.PositionModel{DB: db},
 		tokenMaker: maker,
 		api_key:    os.Getenv("STOCKS_API_KEY"),
 		errorLog:   errorLog,

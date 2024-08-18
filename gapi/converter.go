@@ -17,3 +17,13 @@ func convertUser(user *models.User) *pb.User {
 		CreatedAt: timestamppb.New(user.CreatedAt),
 	}
 }
+
+func convertPosition(p *models.Position) *pb.Position {
+	return &pb.Position{
+		Id:            int32(p.ID),
+		Symbol:        p.Symbol,
+		HeldBy:        int32(p.HeldBy),
+		PurchasedAt:   timestamppb.New(p.PurchasedAt),
+		PurchasePrice: p.PurchasePrice,
+	}
+}

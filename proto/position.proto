@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+message Position {
+    int32 id = 1;
+    string symbol = 2;
+    int32 heldBy = 3;
+    google.protobuf.Timestamp purchasedAt = 4;
+    double purchasePrice = 5;
+    double qty = 6;
+}

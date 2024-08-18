@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+import "position.proto";
+
+option go_package = "github.com/colin-mcl/stocks/pb";
+
+message GetPositionRequest {
+    int32 id = 1;
+}
+
+message GetPositionResponse {
+    Position pos = 1;
+}
