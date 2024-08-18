@@ -13,7 +13,7 @@ import (
 func (server *Server) GetPosition(ctx context.Context, r *pb.GetPositionRequest) (*pb.GetPositionResponse, error) {
 	server.infoLog.Printf("get position request received: %d", r.GetId())
 
-	_, err := server.authorizeUser(ctx)
+	_, err := server.authenticateUser(ctx)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "unauthorized: ", err.Error())

@@ -9,21 +9,21 @@ import (
 )
 
 const (
-	authorizationHeader = "authorization"
+	authenticationHeader = "authentication"
 )
 
-// authorizeUser authorizes a user's credentials by verifying the access
+// authenticateUser authenticates a user's credentials by verifying the access
 // token passed in the metadata of the context and returns its payload if it is
 // valid
-func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error) {
+func (server *Server) authenticateUser(ctx context.Context) (*token.Payload, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, fmt.Errorf("missing metadata")
 	}
 
-	values := md.Get(authorizationHeader)
+	values := md.Get(authenticationHeader)
 	if len(values) == 0 {
-		return nil, fmt.Errorf("missing authorization header")
+		return nil, fmt.Errorf("missing authentication header")
 	}
 
 	accessToken := values[0]

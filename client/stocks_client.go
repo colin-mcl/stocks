@@ -97,7 +97,7 @@ func (stocksClient *StocksClient) GetUser(email, accessToken string) (*pb.User, 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", accessToken)
+	ctx = metadata.AppendToOutgoingContext(ctx, "authentication", accessToken)
 
 	resp, err := stocksClient.service.GetUser(ctx, req)
 	if err != nil {
