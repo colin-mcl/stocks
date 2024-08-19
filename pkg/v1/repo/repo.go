@@ -14,15 +14,19 @@ type RepoInterface interface {
 	// creates a user with the data supplied and returns the id if successful
 	CreateUser(u *models.User) (int, error)
 
-	// get retrieves the user instance
-	GetUser(email string) (*models.User, error)
+	// get retrieves the user instance by id if it exists
+	GetUser(id int) (*models.User, error)
+
+	// GetUserByEmail gets the user by email if it exist
+	GetUserByEmail(email string) (*models.User, error)
 
 	// exists checks whether there exists a user with the given ID
 	UserExists(id int) (bool, error)
 
+	//TODO: move to usecase layer if needed?
 	// authenticate verifies that a user with the provided email and password
 	// exists and returns the ID if so
-	Authenticate(email, password string) (int, error)
+	// Authenticate(email, password string) (int, error)
 }
 
 type Repo struct {

@@ -1,6 +1,10 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/go-sql-driver/mysql"
+)
 
 func NewDBConn() (*sql.DB, error) {
 	db, err := sql.Open("mysql", "web:Amsterdam22!@/stocks?parseTime=true")
