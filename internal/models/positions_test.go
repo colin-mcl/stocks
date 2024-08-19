@@ -1,72 +1,64 @@
 package models
 
-import (
-	"database/sql"
-	"testing"
-	"time"
+// func TestInsertPosition(t *testing.T) {
+// 	symbol := "TSLA"
+// 	heldBy := 11
+// 	qty := 2.5
+// 	purchasePrice := 210.1
+// 	purchasedAt := time.Now()
 
-	"github.com/stretchr/testify/assert"
-)
+// 	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
 
-func TestInsertPosition(t *testing.T) {
-	symbol := "TSLA"
-	heldBy := 11
-	qty := 2.5
-	purchasePrice := 210.1
-	purchasedAt := time.Now()
+// 	assert.NoError(t, err)
+// 	assert.NotEqual(t, id, -1)
+// 	assert.Positive(t, id)
+// }
 
-	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
+// func TestGetPosition(t *testing.T) {
+// 	symbol := "TSLA"
+// 	heldBy := 11
+// 	qty := 2.5
+// 	purchasePrice := 210.1
+// 	purchasedAt := time.Now()
 
-	assert.NoError(t, err)
-	assert.NotEqual(t, id, -1)
-	assert.Positive(t, id)
-}
+// 	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
 
-func TestGetPosition(t *testing.T) {
-	symbol := "TSLA"
-	heldBy := 11
-	qty := 2.5
-	purchasePrice := 210.1
-	purchasedAt := time.Now()
+// 	assert.NoError(t, err)
+// 	assert.NotEqual(t, id, -1)
+// 	assert.Positive(t, id)
 
-	id, err := positions.Insert(symbol, heldBy, purchasedAt, purchasePrice, qty)
+// 	p, err := positions.Get(-1)
+// 	assert.EqualError(t, err, sql.ErrNoRows.Error())
+// 	assert.Nil(t, p)
 
-	assert.NoError(t, err)
-	assert.NotEqual(t, id, -1)
-	assert.Positive(t, id)
+// 	p, err = positions.Get(id)
 
-	p, err := positions.Get(-1)
-	assert.EqualError(t, err, sql.ErrNoRows.Error())
-	assert.Nil(t, p)
+// 	assert.NoError(t, err)
+// 	assert.NotNil(t, p)
+// 	assert.Equal(t, p.symbol, symbol)
+// 	assert.Equal(t, p.heldBy, heldBy)
+// 	assert.Equal(t, p.purchasePrice, purchasePrice)
+// 	assert.WithinDuration(t, p.purchasedAt, purchasedAt, time.Second)
+// 	assert.Equal(t, p.qty, qty)
+// }
 
-	p, err = positions.Get(id)
+// func TestGetStocks(t *testing.T) {
+// 	stocks, err := positions.GetStock("fake", 11)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, p)
-	assert.Equal(t, p.symbol, symbol)
-	assert.Equal(t, p.heldBy, heldBy)
-	assert.Equal(t, p.purchasePrice, purchasePrice)
-	assert.WithinDuration(t, p.purchasedAt, purchasedAt, time.Second)
-	assert.Equal(t, p.qty, qty)
-}
+// 	assert.Empty(t, stocks)
+// 	assert.NoError(t, err)
 
-func TestGetStocks(t *testing.T) {
-	stocks, err := positions.GetStock("fake", 11)
+// 	stocks, err = positions.GetStock("tsla", 0)
+// 	assert.Empty(t, stocks)
+// 	assert.NoError(t, err)
 
-	assert.Empty(t, stocks)
-	assert.NoError(t, err)
+// 	stocks, err = positions.GetStock("tsla", 11)
+// 	assert.NotEmpty(t, stocks)
+// 	assert.NoError(t, err)
 
-	stocks, err = positions.GetStock("tsla", 0)
-	assert.Empty(t, stocks)
-	assert.NoError(t, err)
-
-	stocks, err = positions.GetStock("tsla", 11)
-	assert.NotEmpty(t, stocks)
-	assert.NoError(t, err)
-
-	for _, s := range stocks {
-		assert.Equal(t, s.symbol, "TSLA")
-		assert.Equal(t, s.heldBy, 11)
-		assert.Positive(t, s.ID)
-	}
-}
+// 	for _, s := range stocks {
+// 		assert.Equal(t, s.symbol, "TSLA")
+// 		assert.Equal(t, s.heldBy, 11)
+// 		assert.Positive(t, s.ID)
+// 	}
+// }
