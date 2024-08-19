@@ -54,7 +54,7 @@ func (repo *Repo) CreateUser(u *models.User) (int, error) {
 // Gets the user with the provided id if it exists in the db
 func (repo *Repo) GetUser(id int) (*models.User, error) {
 	stmt := `SELECT username, email, hashed_password, first_name,
-	last_name, created_at FROM users
+	last_name FROM users
 	WHERE id = ?`
 
 	row := repo.db.QueryRow(stmt, id)
@@ -80,7 +80,7 @@ func (repo *Repo) GetUser(id int) (*models.User, error) {
 // Gets the user with the provided email if it exists in the db
 func (repo *Repo) GetUserByEmail(email string) (*models.User, error) {
 	stmt := `SELECT username, email, hashed_password, first_name,
-	last_name, created_at FROM users
+	last_name FROM users
 	WHERE email = ?`
 
 	row := repo.db.QueryRow(stmt, email)
