@@ -66,3 +66,28 @@ func TestUserExists(t *testing.T) {
 	assert.True(t, exists)
 	assert.NoError(t, err)
 }
+
+func TestDeleteUser(t *testing.T) {
+	id, err := testRepo.CreateUser(&models.User{
+		Username:       "username",
+		Email:          "delete@email.com",
+		HashedPassword: []byte("password"),
+		FirstName:      "first",
+		LastName:       "last",
+	})
+
+	assert.NoError(t, err)
+	assert.Positive(t, id)
+
+	err = testRepo.DeleteUser(id)
+	assert.NoError(t, err)
+
+	u, err := testRepo.GetUser(id)
+	assert.Nil(t, u)
+	assert.Error(t, err)
+	assert.EqualError(t, err, sql.ErrNoRows.Error())
+
+	// should not be an error to delete a non existent id
+	err = testRepo.DeleteUser(id)
+	assert.NoError(t, err)
+}

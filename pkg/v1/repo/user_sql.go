@@ -122,6 +122,17 @@ func (repo *Repo) UserExists(id int) (bool, error) {
 	return true, nil
 }
 
+// DeleteUser
+//
+// Attempts to delete a user by their id
+func (repo *Repo) DeleteUser(id int) error {
+	stmt := `DELETE FROM users WHERE id = ?`
+
+	_, err := repo.db.Exec(stmt, id)
+
+	return err
+}
+
 // TODO: is this used anywhere? which layer should it go on?
 // Authenticate
 //

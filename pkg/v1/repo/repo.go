@@ -23,6 +23,9 @@ type RepoInterface interface {
 	// exists checks whether there exists a user with the given ID
 	UserExists(id int) (bool, error)
 
+	// deletes a user by their id, returning an error if unsuccessful
+	DeleteUser(id int) error
+
 	//TODO: move to usecase layer if needed?
 	// authenticate verifies that a user with the provided email and password
 	// exists and returns the ID if so
