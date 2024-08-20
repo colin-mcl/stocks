@@ -9,12 +9,6 @@ import (
 
 // user_sql implements the user methods on the repo
 
-// TODO: move to usecase layer
-var (
-	ErrAlreadyExists      error = errors.New("error: user already exists")
-	ErrInvalidCredentials error = errors.New("error: invalid credentials")
-)
-
 // CreateUser
 //
 // Creates a new user which was supplied as the argument and returns the ID
@@ -30,15 +24,6 @@ func (repo *Repo) CreateUser(u *models.User) (int, error) {
 		string(u.HashedPassword))
 
 	if err != nil {
-		// TODO: this logic goes in usecase layer
-		// var mySQLError *mysql.MySQLError
-		// if errors.As(err, &mySQLError) {
-		// 	if mySQLError.Number == 1062 &&
-		// 		strings.Contains(mySQLError.Message, "users_uc_email") {
-		// 		return -1, ErrAlreadyExists
-		// 	}
-		// }
-
 		return -1, err
 	}
 
