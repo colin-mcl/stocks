@@ -7,14 +7,13 @@ import (
 )
 
 // Provides a simple function to convert user model to user protobuf struct
-func convertUser(user *models.User) *pb.User {
+func convertUser(user *models.User, id int32) *pb.User {
 	return &pb.User{
-		Id:        int32(user.ID),
+		Id:        id,
 		Username:  user.Username,
 		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
-		CreatedAt: timestamppb.New(user.CreatedAt),
 	}
 }
 
