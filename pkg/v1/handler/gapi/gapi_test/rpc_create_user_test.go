@@ -1,4 +1,4 @@
-package gapi
+package gapi_test
 
 import (
 	"context"

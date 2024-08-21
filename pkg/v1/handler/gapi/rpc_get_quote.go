@@ -35,19 +35,26 @@ type badResponse struct {
 func (server *Server) GetQuote(ctx context.Context, r *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
 	server.infoLog.Printf("get quote request recieved: %s\n", r.GetSymbol())
 
+	if r.GetSymbol() == "" {
+		return nil, status.Errorf(codes.InvalidArgument,
+			"invalid quote symbol: ")
+	}
+
 	// Create new HTTP request and add API key to the header
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf(yahooURL, url.QueryEscape(r.GetSymbol())), nil)
 	req.Header.Set("x-api-key", server.api_key)
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create request %s", err)
+		return nil, status.Errorf(codes.Internal,
+			"failed to create request %s", err)
 	}
 
 	// Make HTTP request with the default client
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to execute get request, %s", err)
+		return nil, status.Errorf(codes.Internal,
+			"failed to execute get request, %s", err)
 
 	}
 	defer response.Body.Close()
@@ -55,7 +62,8 @@ func (server *Server) GetQuote(ctx context.Context, r *pb.GetQuoteRequest) (*pb.
 	// Read the body of the response as a slice of bytes and reset the io Reader
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to read body of request")
+		return nil, status.Errorf(codes.Internal,
+			"failed to read body of request")
 	}
 
 	response.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
@@ -73,13 +81,15 @@ func (server *Server) GetQuote(ctx context.Context, r *pb.GetQuoteRequest) (*pb.
 	err = protojson.Unmarshal(bodyBytes, y)
 
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to unmarshal to yahoo response: %s", err)
+		return nil, status.Errorf(codes.Internal,
+			"failed to unmarshal to yahoo response: %s", err)
 	}
 
 	// Check if we got 0 quotes in the result, implying an invalid symbol
 	quotes := y.GetQuoteResponse().GetResult()
 	if len(quotes) == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid quote symbol: %s", r.GetSymbol())
+		return nil, status.Errorf(codes.InvalidArgument,
+			"invalid quote symbol: %s", r.GetSymbol())
 	}
 
 	return &pb.GetQuoteResponse{Quote: quotes[0]}, nil
