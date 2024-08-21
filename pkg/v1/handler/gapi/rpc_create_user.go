@@ -2,10 +2,10 @@ package gapi
 
 import (
 	"context"
-	"errors"
 
 	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -13,18 +13,19 @@ import (
 func (server *Server) CreateUser(ctx context.Context, r *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	server.infoLog.Printf("create user request received: %s\n", r.GetEmail())
 
-	id, err := server.users.Insert(
-		r.GetFirstName(),
-		r.GetLastName(),
-		r.GetUsername(),
-		r.GetEmail(),
-		r.GetPassword(),
-	)
+	pswd, err := bcrypt.GenerateFromPassword([]byte(r.GetPassword()), 12)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "hashing failed: %s", err)
+	}
+
+	id, err := server.uc.CreateUser(&models.User{
+		Username:       r.GetUsername(),
+		Email:          r.GetEmail(),
+		HashedPassword: pswd,
+		FirstName:      r.GetFirstName(),
+		LastName:       r.GetLastName()})
 
 	if err != nil {
-		if errors.Is(err, models.ErrAlreadyExists) {
-			return nil, status.Errorf(codes.AlreadyExists, "user already exists: %s", err)
-		}
 		return nil, status.Errorf(codes.Internal, "failed to create new user %s", err)
 	}
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/colin-mcl/stocks/token"
+	"github.com/colin-mcl/stocks/internal/token"
 	"google.golang.org/grpc/metadata"
 )
 

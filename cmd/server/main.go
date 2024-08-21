@@ -8,8 +8,10 @@ import (
 	"os"
 
 	"github.com/colin-mcl/stocks/controllers"
-	"github.com/colin-mcl/stocks/gapi"
+	"github.com/colin-mcl/stocks/internal/db"
+	"github.com/colin-mcl/stocks/internal/token"
 	"github.com/colin-mcl/stocks/pb"
+	"github.com/colin-mcl/stocks/pkg/v1/handler/gapi"
 	"github.com/colin-mcl/stocks/util"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
@@ -26,8 +28,7 @@ func main() {
 	infoLog := log.New(os.Stdout, "[INFO] ", log.Ldate|log.Ltime)
 
 	// open mysql database connection and check for errors
-	// TODO: change this to not be hard coded
-	db, err := util.OpenDB("web:Amsterdam22!@/stocks?parseTime=true")
+	db, err := db.NewDBConn()
 
 	if err != nil {
 		errorLog.Fatal(err)
@@ -44,11 +45,15 @@ func main() {
 
 func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error {
 
-	// Instantiate our internal server with the correspoding models, db and logs
-	server, err := gapi.NewServer(db, errorLog, infoLog)
+	// Create a PasetoMaker with symmetric key
+	// TODO: make key an env variable
+	maker, err := token.NewPasetoMaker(util.RandomString(32))
 	if err != nil {
-		return fmt.Errorf("failed to create server:%w", err)
+		return err
 	}
+
+	// Instantiate our internal server with the correspoding models, db and logs
+	server := gapi.NewServer(db, errorLog, infoLog, maker)
 
 	// Load server TLS certificate and key from files in cert subfolder
 	// TODO: make this an environment var

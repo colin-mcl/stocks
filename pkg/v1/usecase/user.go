@@ -12,6 +12,7 @@ import (
 var (
 	ErrAlreadyExists error = errors.New("error: user already exists")
 	ErrDoesNotExist  error = errors.New("error: does not exist")
+	ErrEmptyField    error = errors.New("error: user cannot have empty field")
 )
 
 // CreateUser
@@ -19,12 +20,19 @@ var (
 // Creates a new user from the supplied argument if the email does not
 // already exist
 func (uc *UseCase) CreateUser(u *models.User) (int, error) {
+	// checks that user does not already exist
 	if _, err := uc.repo.GetUserByEmail(u.Email); !errors.Is(err, sql.ErrNoRows) {
 		return -1, ErrAlreadyExists
 	}
 
-	id, err := uc.repo.CreateUser(u)
+	// checks that all fields are non-empty
+	// TODO: more validation later?
+	if u.Email == "" || u.Username == "" || len(u.HashedPassword) == 0 ||
+		u.FirstName == "" || u.LastName == "" {
+		return -1, ErrEmptyField
+	}
 
+	id, err := uc.repo.CreateUser(u)
 	if err != nil {
 		return -1, err
 	}

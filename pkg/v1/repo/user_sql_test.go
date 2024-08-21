@@ -12,12 +12,12 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	pswd, _ := bcrypt.GenerateFromPassword([]byte("password"), 12)
-	u, _ := models.NewUser(
-		"user",
-		util.RandomString(16),
-		pswd,
-		"first",
-		"last")
+	u := &models.User{
+		Username:       "user",
+		Email:          util.RandomString(16),
+		HashedPassword: pswd,
+		FirstName:      "first",
+		LastName:       "last"}
 
 	id, err := testRepo.CreateUser(u)
 

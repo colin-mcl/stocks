@@ -6,7 +6,7 @@ proto:
 
 server:
 	export STOCKS_API_KEY=JpzjMLsDTy47kVDb1ujQx5ks3CetiVLn4bb7KHjH
-	go run main.go
+	go run cmd/server/main.go
 
 stocks_cli:
 	cd stocks_cli

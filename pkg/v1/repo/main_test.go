@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	db "github.com/colin-mcl/stocks/internal/db"
+	"github.com/colin-mcl/stocks/internal/db"
 )
 
 var testRepo RepoInterface
