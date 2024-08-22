@@ -24,5 +24,5 @@ func (server *Server) GetUser(
 			"failed to get user with id %d: %s\n", r.GetId(), err)
 	}
 
-	return &pb.GetUserResponse{User: convertUser(u, r.GetId())}, nil
+	return &pb.GetUserResponse{User: convertUser(u)}, nil
 }

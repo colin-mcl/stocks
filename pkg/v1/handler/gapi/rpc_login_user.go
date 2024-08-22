@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -17,27 +16,23 @@ func (server *Server) LoginUser(ctx context.Context, r *pb.LoginUserRequest) (*p
 	server.infoLog.Printf("login request received: %s", r.GetEmail())
 
 	// Get the user and check if it exists
-	user, err := server.users.Get(r.GetEmail())
+	user, err := server.uc.GetUserByEmail(r.GetEmail())
 
 	if err != nil {
-		if errors.Is(err, models.ErrInvalidCredentials) {
-			return nil, status.Errorf(codes.Unauthenticated, "%s", err)
-		}
 		return nil, status.Errorf(codes.Internal, "failed to login: %s", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(r.GetPassword()))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return nil, status.Errorf(codes.Unauthenticated, "%s", models.ErrInvalidCredentials)
+			return nil, status.Errorf(codes.Unauthenticated, "invalid credentials")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to login: %s", err)
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(
-		user.Email,
-		time.Minute*5,
-	)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Email,
+		time.Minute*5)
+
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create access token: %s", err)
 	}
