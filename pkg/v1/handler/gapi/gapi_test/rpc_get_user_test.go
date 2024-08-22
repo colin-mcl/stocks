@@ -21,19 +21,19 @@ func TestGetUser(t *testing.T) {
 	}
 
 	// TODO: come back when login user is implemented
-	// testServer.CreateUser(context.Background(),
-	// 	&pb.CreateUserRequest{
-	// 		Username:  "user",
-	// 		Email:     "userEmail",
-	// 		Password:  "password",
-	// 		FirstName: "first",
-	// 		LastName:  "last",
-	// 	})
-	// r, err := testServer.LoginUser(context.Background(), &pb.LoginUserRequest{
-	// 	Email:    "userEmail",
-	// 	Password: "password",
-	// })
-	// assert.NoError(t, err)
+	testServer.CreateUser(context.Background(),
+		&pb.CreateUserRequest{
+			Username:  "user",
+			Email:     "userEmail",
+			Password:  "password",
+			FirstName: "first",
+			LastName:  "last",
+		})
+	r, err := testServer.LoginUser(context.Background(), &pb.LoginUserRequest{
+		Email:    "userEmail",
+		Password: "password",
+	})
+	assert.NoError(t, err)
 
 	for _, scenario := range []cases{
 		{
@@ -50,14 +50,14 @@ func TestGetUser(t *testing.T) {
 					"authentication": util.RandomString(16)})),
 			expectedErr: errors.Errorf("unauthorized"),
 		},
-		// {
-		// 	name:  "bad id",
-		// 	input: &pb.GetUserRequest{Id: 0},
-		// 	inputContext: metadata.NewIncomingContext(context.Background(),
-		// 		metadata.New(map[string](string){
-		// 			"authentication": r.GetAccessToken()})),
-		// 	expectedErr: errors.Errorf("failed to get user with id 0"),
-		// },
+		{
+			name:  "bad id",
+			input: &pb.GetUserRequest{Id: 0},
+			inputContext: metadata.NewIncomingContext(context.Background(),
+				metadata.New(map[string](string){
+					"authentication": r.GetAccessToken()})),
+			expectedErr: errors.Errorf("failed to get user with id 0"),
+		},
 	} {
 		t.Run(scenario.name, func(t *testing.T) {
 			resp, err := testServer.GetUser(scenario.inputContext, scenario.input)
