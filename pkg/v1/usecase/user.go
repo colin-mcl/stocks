@@ -57,6 +57,23 @@ func (uc *UseCase) GetUser(id int) (*models.User, error) {
 	return user, nil
 }
 
+// GetUserByEmail
+//
+// Gets the user by their email and returns the instance
+func (uc *UseCase) GetUserByEmail(email string) (*models.User, error) {
+	user, err := uc.repo.GetUserByEmail(email)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrDoesNotExist
+		}
+
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // DeleteUser
 //
 // Deletes the user instance if it exists

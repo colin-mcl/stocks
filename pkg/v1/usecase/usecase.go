@@ -15,6 +15,9 @@ type UseCaseInterface interface {
 	// Retrieves the user instance
 	GetUser(id int) (*models.User, error)
 
+	// Retrieve the user instance by their email
+	GetUserByEmail(email string) (*models.User, error)
+
 	// Deletes the user instance
 	DeleteUser(id int) error
 }

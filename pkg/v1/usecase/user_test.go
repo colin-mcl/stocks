@@ -48,6 +48,21 @@ func TestGetUser(t *testing.T) {
 	assert.Equal(t, "Mclaughlin", user.LastName)
 }
 
+func TestGetUserByEmail(t *testing.T) {
+	user, err := testUC.GetUserByEmail("fake email")
+	assert.Nil(t, user)
+	assert.Error(t, err)
+	assert.EqualError(t, err, ErrDoesNotExist.Error())
+
+	user, err = testUC.GetUserByEmail("colin.mclaughlin02@gmail.com")
+	assert.NoError(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, "colin.mclaughlin02@gmail.com", user.Email)
+	assert.Equal(t, "colin", user.Username)
+	assert.Equal(t, "Colin", user.FirstName)
+	assert.Equal(t, "Mclaughlin", user.LastName)
+}
+
 func TestDeleteUser(t *testing.T) {
 	err := testUC.DeleteUser(0)
 	assert.Error(t, err)
