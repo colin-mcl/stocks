@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -90,7 +91,7 @@ func (stocksClient *StocksClient) LoginUser(email string, password string) (stri
 	return resp.GetAccessToken(), nil
 }
 
-func (stocksClient *StocksClient) GetUser(email, accessToken string) (*pb.User, error) {
+func (stocksClient *StocksClient) GetUser(email, accessToken string) (*models.User, error) {
 	req := &pb.GetUserRequest{Email: email}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -102,5 +103,10 @@ func (stocksClient *StocksClient) GetUser(email, accessToken string) (*pb.User, 
 		return nil, err
 	}
 
-	return resp.GetUser(), nil
+	return &models.User{
+		Username:  resp.GetUser().GetUsername(),
+		Email:     resp.GetUser().GetEmail(),
+		FirstName: resp.GetUser().GetFirstName(),
+		LastName:  resp.GetUser().GetLastName(),
+	}, nil
 }
