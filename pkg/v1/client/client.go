@@ -12,28 +12,31 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// Structure:
-
-// GetQuote: requires NO authorization, users do not need to be logged in
-// LoginUser: user passes their email and password and is returned an access
-//			  token
+// Client
 //
-//
+// The client package wraps the GRPC API used to communicate with the stocks
+// server, providing a simple interface that accepts golang standard types
+// and returns the expected results
 
-// StocksClient provides a simple wrapper for the stocks service rpcs
 type StocksClient struct {
 	// Internal StocksClient service
 	service pb.StocksClient
 }
 
-// Creates a Stocks client with the provided grpc client connection
+// NewStocksClient
+//
+// Returns a new StocksClient instance
+// A grpc client connection must be provided to communicate with the server
 func NewStocksClient(conn *grpc.ClientConn) *StocksClient {
 
 	return &StocksClient{
 		service: pb.NewStocksClient(conn)}
 }
 
-// Gets and prints a simple stock quote
+// GetQuote
+//
+// Given a stock symbol makes the GRPC GetQuote to the server and returns the
+// results in a formatted string
 func (stocksClient *StocksClient) GetQuote(symbol string) (string, error) {
 	// Create RPC request
 	req := &pb.GetQuoteRequest{Symbol: strings.ToUpper(symbol)}
@@ -49,6 +52,10 @@ func (stocksClient *StocksClient) GetQuote(symbol string) (string, error) {
 	return protojson.Format(resp), nil
 }
 
+// CreateUser
+//
+// Given the fields of a user to create makes the GRPC CreateUser to the server
+// and returns the id of the new user if successful
 func (stocksClient *StocksClient) CreateUser(
 	firstName string,
 	lastName string,
@@ -75,7 +82,9 @@ func (stocksClient *StocksClient) CreateUser(
 	return int(resp.GetId()), nil
 }
 
-// LoginUser calls the LoginUser service on the stocks service with the
+// LoginUser
+//
+// calls the LoginUser service on the stocks service with the
 // email and password and returns the access token if the login is suceessful
 func (stocksClient *StocksClient) LoginUser(email string, password string) (string, error) {
 	req := &pb.LoginUserRequest{Email: email, Password: password}
@@ -91,6 +100,10 @@ func (stocksClient *StocksClient) LoginUser(email string, password string) (stri
 	return resp.GetAccessToken(), nil
 }
 
+// GetUser
+//
+// Makes the GRPC GetUser to the server given the provided email and access token
+// returns the result as a models.User pointer if successful
 func (stocksClient *StocksClient) GetUser(email, accessToken string) (*models.User, error) {
 	req := &pb.GetUserRequest{Email: email}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
