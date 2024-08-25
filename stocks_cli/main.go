@@ -34,7 +34,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/colin-mcl/stocks/client"
+	client "github.com/colin-mcl/stocks/pkg/v1/stocks_client"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

@@ -39,7 +39,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/colin-mcl/stocks/client"
+	client "github.com/colin-mcl/stocks/pkg/v1/stocks_client"
 	"golang.org/x/term"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

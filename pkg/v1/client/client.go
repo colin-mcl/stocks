@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -12,7 +11,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// Desired structure:
+// Structure:
 
 // GetQuote: requires NO authorization, users do not need to be logged in
 // LoginUser: user passes their email and password and is returned an access
@@ -34,7 +33,7 @@ func NewStocksClient(conn *grpc.ClientConn) *StocksClient {
 }
 
 // Gets and prints a simple stock quote
-func (stocksClient *StocksClient) GetQuote(symbol string) error {
+func (stocksClient *StocksClient) GetQuote(symbol string) (string, error) {
 	// Create RPC request
 	req := &pb.GetQuoteRequest{Symbol: strings.ToUpper(symbol)}
 
@@ -43,11 +42,10 @@ func (stocksClient *StocksClient) GetQuote(symbol string) error {
 
 	resp, err := stocksClient.service.GetQuote(ctx, req)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	fmt.Println(protojson.Format(resp))
-	return nil
+	return protojson.Format(resp), nil
 }
 
 func (stocksClient *StocksClient) CreateUser(
