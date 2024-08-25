@@ -38,13 +38,13 @@ func TestGetUser(t *testing.T) {
 	for _, scenario := range []cases{
 		{
 			name:         "no authentication",
-			input:        &pb.GetUserRequest{Id: 11},
+			input:        &pb.GetUserRequest{Email: "userEmail"},
 			inputContext: context.Background(),
 			expectedErr:  errors.Errorf("unauthorized"),
 		},
 		{
 			name:  "bad authentication",
-			input: &pb.GetUserRequest{Id: 11},
+			input: &pb.GetUserRequest{Email: "userEmail"},
 			inputContext: metadata.NewIncomingContext(context.Background(),
 				metadata.New(map[string](string){
 					"authentication": util.RandomString(16)})),
@@ -52,11 +52,11 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			name:  "bad id",
-			input: &pb.GetUserRequest{Id: 0},
+			input: &pb.GetUserRequest{Email: "fake email"},
 			inputContext: metadata.NewIncomingContext(context.Background(),
 				metadata.New(map[string](string){
 					"authentication": r.GetAccessToken()})),
-			expectedErr: errors.Errorf("failed to get user with id 0"),
+			expectedErr: errors.Errorf("failed to get user with email fake email"),
 		},
 	} {
 		t.Run(scenario.name, func(t *testing.T) {
@@ -66,4 +66,16 @@ func TestGetUser(t *testing.T) {
 			assert.ErrorContains(t, err, scenario.expectedErr.Error())
 		})
 	}
+
+	resp, err := testServer.GetUser(
+		metadata.NewIncomingContext(context.Background(), metadata.New(
+			map[string](string){"authentication": r.GetAccessToken()},
+		)), &pb.GetUserRequest{Email: "userEmail"})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, "userEmail", resp.GetUser().GetEmail())
+	assert.Equal(t, "user", resp.GetUser().GetUsername())
+	assert.Equal(t, "first", resp.GetUser().GetFirstName())
+	assert.Equal(t, "last", resp.GetUser().GetLastName())
 }
