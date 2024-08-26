@@ -207,7 +207,7 @@ func (c *CLI) getUser() error {
 		return err
 	}
 
-	fmt.Printf("Username: %s, Email: %s, First Name: %s, Last Name: %s",
+	fmt.Printf("Username: %s, Email: %s, First Name: %s, Last Name: %s\n",
 		user.Username, user.Email, user.FirstName, user.LastName)
 	return nil
 }

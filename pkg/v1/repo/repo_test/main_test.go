@@ -1,4 +1,4 @@
-package repo
+package repo_test
 
 import (
 	"log"
@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/colin-mcl/stocks/internal/db"
+	"github.com/colin-mcl/stocks/pkg/v1/repo"
 )
 
-var testRepo RepoInterface
+var testRepo repo.RepoInterface
 
 // test all repository interface functionality
 // currently uses real DB for testing
@@ -19,7 +20,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	testRepo = NewRepo(db)
+	testRepo = repo.NewRepo(db)
 
 	os.Exit(m.Run())
 }

@@ -1,4 +1,4 @@
-package repo
+package repo_test
 
 import (
 	"database/sql"

@@ -26,10 +26,9 @@ type RepoInterface interface {
 	// deletes a user by their id, returning an error if unsuccessful
 	DeleteUser(id int) error
 
-	//TODO: move to usecase layer if needed?
-	// authenticate verifies that a user with the provided email and password
-	// exists and returns the ID if so
-	// Authenticate(email, password string) (int, error)
+	// creates a position in the table from the supplied position object,
+	// returning the id if successful
+	CreatePosition(p *models.Position) (int, error)
 }
 
 type Repo struct {

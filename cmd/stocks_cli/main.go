@@ -17,9 +17,9 @@ It accepts the following options:
 The following configurations must be in place:
 	- env variable STOCKS_URL=your_stocks_serverurl
 		e.g. http://localhost:9090
-	- TLS trusted certificates file (ca-cert.pem) must be stored in a folder
-	   named cert one level above this folder
-	TODO: change this to environment variable
+	- TLS trusted certificates file must be set with the CERT_PATH environment
+		variable
+		e.g. CERT_PATH=~/Users/you/Desktop/project/cert/ca-cert.pem
 
 See cmd_client.go for documentation on commands which are accepted
 */
