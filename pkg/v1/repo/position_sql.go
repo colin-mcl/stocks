@@ -30,3 +30,26 @@ func (repo *Repo) CreatePosition(p *models.Position) (int, error) {
 	return int(id), nil
 
 }
+
+// Gets the position with the matching ID if it exists
+func (repo *Repo) GetPosition(id int) (*models.Position, error) {
+	stmt := `SELECT * FROM positions WHERE id = ?`
+
+	row := repo.db.QueryRow(stmt, id)
+
+	p := &models.Position{}
+
+	err := row.Scan(
+		&p.ID,
+		&p.Symbol,
+		&p.HeldBy,
+		&p.PurchasedAt,
+		&p.PurchasePrice,
+		&p.Qty)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
+}

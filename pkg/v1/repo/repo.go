@@ -29,6 +29,9 @@ type RepoInterface interface {
 	// creates a position in the table from the supplied position object,
 	// returning the id if successful
 	CreatePosition(p *models.Position) (int, error)
+
+	// gets the position with the matching ID if it exists
+	GetPosition(id int) (*models.Position, error)
 }
 
 type Repo struct {
