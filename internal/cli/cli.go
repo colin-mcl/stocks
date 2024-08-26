@@ -1,8 +1,8 @@
-package main
+package cli
 
-/* cmd_client.go
+/* cli.go
 
-Contains implementation for the private cmdClient struct which wraps all
+Contains implementation for the private CLI struct which wraps all
 available commands and implementation details for the command line interface.
 
 Supported commands:
@@ -39,15 +39,15 @@ import (
 	"strings"
 	"syscall"
 
-	client "github.com/colin-mcl/stocks/pkg/v1/stocks_client"
+	"github.com/colin-mcl/stocks/pkg/v1/client"
 	"golang.org/x/term"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-// cmdClient struct wraps the stocksClient, loggers, user and reader so that
+// CLI struct wraps the stocksClient, loggers, user and reader so that
 // simple functions can be called to perform the implemented commands
-type cmdClient struct {
+type CLI struct {
 	// stocksClient for interfacing with the stocks service
 	stocksClient *client.StocksClient
 
@@ -61,19 +61,23 @@ type cmdClient struct {
 	running bool
 }
 
-// Represents an authenticated user on the stocks client
+// Represents an authenticated user on the stocks cli
 type authenticatedUser struct {
 	email string
 
 	accessToken string
 }
 
-func newCmdClient(
+// NewCLI
+//
+// Given the parameters needed to run the CLI, create a new CLI instance
+// and return its pointer
+func NewCLI(
 	c *client.StocksClient,
 	errorLog *log.Logger,
 	infoLog *log.Logger,
-	r *bufio.Reader) *cmdClient {
-	return &cmdClient{
+	r *bufio.Reader) *CLI {
+	return &CLI{
 		stocksClient: c,
 		errorLog:     errorLog,
 		infoLog:      infoLog,
@@ -82,24 +86,32 @@ func newCmdClient(
 	}
 }
 
-// Runs the command client
-func (client *cmdClient) run() error {
+// Run
+//
+// Runs the CLI
+func (c *CLI) Run() error {
 
-	client.running = true
+	c.running = true
 	fmt.Printf("\t\t\t\t\t  STOCKS PROGRAM\n")
 	fmt.Printf("Run `help` to see available commands\n")
 	fmt.Println("-----------------------------------------------------------------------------------------------")
 
-	var err error = nil
+	var err error
 	// infinite loop for reading user commands
-	for err == nil && client.running {
-		err = client.loop()
+	for c.running {
+		err = c.loop()
+		if err != nil {
+			c.errorLog.Println(err)
+		}
 	}
 
 	return err
 }
 
-func (client *cmdClient) help() {
+// help
+//
+// Prints the CLI help message with all available commands
+func (c *CLI) help() {
 	fmt.Println(`
 ***** COMMANDS ******
 To see the list of support commands
@@ -126,15 +138,15 @@ To quit the program
 }
 
 // Loops infinitely until a fatal error occurs or the user quits
-func (client *cmdClient) loop() error {
+func (c *CLI) loop() error {
 
 	// print current logged in user before prompt
-	if client.user != nil {
-		fmt.Printf("%s ", client.user.email)
+	if c.user != nil {
+		fmt.Printf("%s ", c.user.email)
 	}
 	fmt.Print("-> ")
 
-	text, err := client.reader.ReadString('\n')
+	text, err := c.reader.ReadString('\n')
 	if err != nil {
 		return err
 	}
@@ -148,77 +160,84 @@ func (client *cmdClient) loop() error {
 
 	switch command {
 	case "help":
-		client.help()
+		c.help()
 	case "quit":
-		client.running = false
+		c.running = false
 	case "get":
-		err = client.stocksClient.GetQuote(words[1])
+		if len(words) != 2 {
+			c.errorLog.Println("Please provide a stock symbol to get")
+			break
+		}
+
+		var result string
+		result, err = c.stocksClient.GetQuote(words[1])
+		if err == nil {
+			fmt.Println(result)
+		}
 	case "create":
-		err = client.createUser()
+		err = c.createUser()
 	case "login":
-		err = client.login()
+		err = c.login()
 	case "user":
-		err = client.getUser()
+		err = c.getUser()
 	case "logout":
-		client.logout()
+		c.logout()
 	default:
-		client.errorLog.Println("Invalid command, see reference for command")
+		c.errorLog.Println("Invalid command, see reference for command")
 	}
 
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Gets information of the current logged in user, or prints an error if no
 // user is currently logged in
-func (client *cmdClient) getUser() error {
-	if client.user == nil {
-		client.errorLog.Printf("Error: must be logged in to get user info")
+func (c *CLI) getUser() error {
+	if c.user == nil {
+		c.errorLog.Printf("Error: must be logged in to get user info")
 		return nil
 	}
 
-	user, err := client.stocksClient.GetUser(client.user.email, client.user.accessToken)
+	user, err := c.stocksClient.GetUser(c.user.email, c.user.accessToken)
 	if err != nil {
 		st, ok := status.FromError(err)
 		if ok && st.Code() == codes.Unauthenticated {
-			client.errorLog.Print(err)
+			c.errorLog.Print(err)
 			return nil
 		}
 		return err
 	}
 
-	fmt.Println(user.String())
+	fmt.Printf("Username: %s, Email: %s, First Name: %s, Last Name: %s",
+		user.Username, user.Email, user.FirstName, user.LastName)
 	return nil
 }
 
 // Logs out the current user or prints an error message if no user is logged in
-func (client *cmdClient) logout() {
-	if client.user != nil {
-		client.user = nil
+func (c *CLI) logout() {
+	if c.user != nil {
+		c.user = nil
 	} else {
-		client.errorLog.Printf("Error: attempted to log out when no user is logged in")
+		c.errorLog.Printf("Error: attempted to log out when no user is logged in")
 	}
 }
 
 // Logs into a user account by prompting for email and password and making
 // request to the stocksClient
-func (client *cmdClient) login() error {
-	if client.user != nil {
-		client.errorLog.Print("Error: already logged in, to log in again please log out first")
+func (c *CLI) login() error {
+	if c.user != nil {
+		c.errorLog.Print("Error: already logged in, to log in again please log out first")
 		return nil
 	}
 
 	fmt.Printf("Enter email: ")
-	text, err := client.reader.ReadString('\n')
+	text, err := c.reader.ReadString('\n')
 	if err != nil {
 		return nil
 	}
 
 	words := strings.Fields(text)
 	if len(words) == 0 {
-		client.errorLog.Print("no email entered")
+		c.errorLog.Print("no email entered")
 		return nil
 	}
 	email := words[0]
@@ -231,42 +250,42 @@ func (client *cmdClient) login() error {
 	}
 
 	// authenticate user
-	token, err := client.stocksClient.LoginUser(email, string(bytePassword))
+	token, err := c.stocksClient.LoginUser(email, string(bytePassword))
 	if err != nil {
 		st, ok := status.FromError(err)
 		if ok && st.Code() == codes.Unauthenticated {
-			client.errorLog.Print("Invalid credentials")
+			c.errorLog.Print("Invalid credentials")
 			return nil
 		}
 		return err
 	}
 
-	client.user = &authenticatedUser{email: email, accessToken: token}
+	c.user = &authenticatedUser{email: email, accessToken: token}
 	fmt.Println()
 	return nil
 }
 
 // createUser gets the appropriate fields from reader to create a user on
 // the stocks client
-func (client *cmdClient) createUser() error {
+func (c *CLI) createUser() error {
 	fmt.Printf("Enter the following fields separated by spaces: firstname, lastname, username, email, password:\n-> ")
-	text, err := client.reader.ReadString('\n')
+	text, err := c.reader.ReadString('\n')
 	if err != nil {
 		return err
 	}
 
 	words := strings.Fields(text)
 	if len(words) != 5 {
-		client.errorLog.Printf("Error: incorrect number of fields for create user")
+		c.errorLog.Printf("Error: incorrect number of fields for create user")
 		return nil
 	}
 
-	id, err := client.stocksClient.CreateUser(words[0], words[1], words[2], words[3], words[4])
+	id, err := c.stocksClient.CreateUser(words[0], words[1], words[2], words[3], words[4])
 
 	if err != nil {
 		st, ok := status.FromError(err)
 		if ok && st.Code() == codes.AlreadyExists {
-			client.errorLog.Print("user already exists")
+			c.errorLog.Print("user already exists")
 			return nil
 		} else {
 			return err

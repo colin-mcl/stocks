@@ -27,4 +27,8 @@ func TestGetQuote(t *testing.T) {
 	assert.Contains(t, s, "TSLA")
 	assert.Contains(t, s, "Tesla")
 	assert.Contains(t, s, "USD")
+
+	s, err = testClient.GetQuote("AAAAAAAAA")
+	assert.Error(t, err)
+	assert.Equal(t, "", s)
 }
