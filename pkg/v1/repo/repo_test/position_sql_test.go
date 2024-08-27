@@ -83,3 +83,20 @@ func TestGetPositions(t *testing.T) {
 		assert.Positive(t, p.ID)
 	}
 }
+
+func TestGetPortfolio(t *testing.T) {
+	ps, err := testRepo.GetPortfolio(1)
+	assert.Nil(t, ps)
+	assert.NoError(t, err)
+
+	ps, err = testRepo.GetPortfolio(11)
+	assert.NotNil(t, ps)
+	assert.NoError(t, err)
+
+	for _, p := range ps {
+		assert.True(t, (p.Symbol == "TSLA" || p.Symbol == "AAPL"))
+		assert.GreaterOrEqual(t, p.PurchasePrice, 210.1)
+		assert.GreaterOrEqual(t, p.Qty, 2.5)
+		assert.Equal(t, 11, p.HeldBy)
+	}
+}

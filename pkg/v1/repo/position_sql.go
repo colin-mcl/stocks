@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"database/sql"
 	"strings"
 
 	"github.com/colin-mcl/stocks/internal/models"
@@ -69,6 +70,31 @@ func (repo *Repo) GetPositions(symbol string, owner int) ([]*models.Position,
 
 	defer rows.Close()
 
+	return scanPositions(rows)
+}
+
+// GetPortfolio
+//
+// Gets all positions with heldBy = owner and returns the result as a slice
+func (repo *Repo) GetPortfolio(owner int) ([]*models.Position, error) {
+	stmt := `SELECT * FROM positions WHERE heldBy = ?`
+
+	rows, err := repo.db.Query(stmt, owner)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	return scanPositions(rows)
+}
+
+// scanRows
+//
+// helper function that scans the position rows provided in rows into a slice
+// and returns it
+func scanPositions(rows *sql.Rows) ([]*models.Position, error) {
 	var positions []*models.Position
 
 	for rows.Next() {
@@ -94,5 +120,4 @@ func (repo *Repo) GetPositions(symbol string, owner int) ([]*models.Position,
 	}
 
 	return positions, nil
-
 }

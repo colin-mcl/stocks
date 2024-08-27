@@ -35,6 +35,9 @@ type RepoInterface interface {
 
 	// gets all positions with the matching symbol and owner
 	GetPositions(symbol string, owner int) ([]*models.Position, error)
+
+	// gets all positions owned by owner
+	GetPortfolio(owner int) ([]*models.Position, error)
 }
 
 type Repo struct {
