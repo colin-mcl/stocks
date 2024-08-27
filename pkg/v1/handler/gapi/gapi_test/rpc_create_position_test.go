@@ -1,4 +1,4 @@
-package gapi
+package gapi_test
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 )
 
 func TestCreatePosition(t *testing.T) {
-	server := makeDefaultServer()
 	req := &pb.CreatePositionRequest{
 		Symbol:        "AAPL",
 		HeldBy:        11,
@@ -21,13 +20,13 @@ func TestCreatePosition(t *testing.T) {
 	}
 
 	// Fails because there is no authentication header
-	resp, err := server.CreatePosition(context.Background(), req)
+	resp, err := testServer.CreatePosition(context.Background(), req)
 
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 
 	// Bad password and practices, only for testing purposes
-	r, err := server.LoginUser(context.Background(), &pb.LoginUserRequest{
+	r, err := testServer.LoginUser(context.Background(), &pb.LoginUserRequest{
 		Email:    "colin.mclaughlin02@gmail.com",
 		Password: "password",
 	})
@@ -37,7 +36,7 @@ func TestCreatePosition(t *testing.T) {
 
 	md := metadata.New(map[string](string){"authentication": r.GetAccessToken()})
 	ctx := metadata.NewIncomingContext(context.Background(), md)
-	resp, err = server.CreatePosition(ctx, req)
+	resp, err = testServer.CreatePosition(ctx, req)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
