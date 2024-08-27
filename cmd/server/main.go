@@ -7,13 +7,11 @@ import (
 	"net"
 	"os"
 
-	"github.com/colin-mcl/stocks/controllers"
 	"github.com/colin-mcl/stocks/internal/db"
 	"github.com/colin-mcl/stocks/internal/token"
 	"github.com/colin-mcl/stocks/pb"
 	"github.com/colin-mcl/stocks/pkg/v1/handler/gapi"
 	"github.com/colin-mcl/stocks/util"
-	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -85,10 +83,10 @@ func runGrpcServer(db *sql.DB, errorLog *log.Logger, infoLog *log.Logger) error 
 	return nil
 }
 
-func runGinServer() {
-	router := gin.Default()
-	router.GET("/tickers/:symbol", controllers.GetTicker)
+// func runGinServer() {
+// 	router := gin.Default()
+// 	router.GET("/tickers/:symbol", controllers.GetTicker)
 
-	// Runs the server on localhost:8080 by default
-	router.Run()
-}
+// 	// Runs the server on localhost:8080 by default
+// 	router.Run()
+// }
