@@ -2,7 +2,6 @@ package gapi_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/colin-mcl/stocks/pb"
@@ -37,8 +36,7 @@ func TestGetQuote(t *testing.T) {
 			resp, err := testServer.GetQuote(context.Background(), scenario.input)
 			assert.Error(t, err)
 			assert.Nil(t, resp)
-			assert.ErrorContains(t, err,
-				fmt.Sprintf("invalid quote symbol: %s", scenario.input.Symbol))
+			assert.ErrorContains(t, err, "bad symbol")
 		})
 	}
 	for _, scenario := range []cases{
