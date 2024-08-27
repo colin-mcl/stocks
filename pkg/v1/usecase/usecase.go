@@ -20,6 +20,15 @@ type UseCaseInterface interface {
 
 	// Deletes the user instance
 	DeleteUser(id int) error
+
+	// Creates the position instance in the table
+	CreatePosition(p *models.Position) (int, error)
+
+	// Gets the position instance given its ID
+	GetPosition(id int) (*models.Position, error)
+
+	// Gets all positions matching the symbol and owner ID
+	GetPositions(symbol string, owner int) ([]*models.Position, error)
 }
 
 type UseCase struct {

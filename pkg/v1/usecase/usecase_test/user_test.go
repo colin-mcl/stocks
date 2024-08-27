@@ -1,9 +1,10 @@
-package usecase
+package usecase_test
 
 import (
 	"testing"
 
 	"github.com/colin-mcl/stocks/internal/models"
+	"github.com/colin-mcl/stocks/pkg/v1/usecase"
 	"github.com/colin-mcl/stocks/util"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,9 +24,43 @@ func TestCreateUser(t *testing.T) {
 
 	assert.Equal(t, -1, id)
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrAlreadyExists.Error())
+	assert.EqualError(t, err, usecase.ErrAlreadyExists.Error())
 
-	u.Email = util.RandomString(22)
+	u.Email = ""
+	id, err = testUC.CreateUser(u)
+	assert.Equal(t, -1, id)
+	assert.Error(t, err)
+	assert.EqualError(t, err, usecase.ErrEmptyField.Error())
+
+	u.Email = util.RandomString(10)
+	u.Username = ""
+	id, err = testUC.CreateUser(u)
+	assert.Equal(t, -1, id)
+	assert.Error(t, err)
+	assert.EqualError(t, err, usecase.ErrEmptyField.Error())
+
+	u.Username = util.RandomString(10)
+	u.HashedPassword = []byte("")
+	id, err = testUC.CreateUser(u)
+	assert.Equal(t, -1, id)
+	assert.Error(t, err)
+	assert.EqualError(t, err, usecase.ErrEmptyField.Error())
+
+	u.HashedPassword = []byte("password")
+	u.FirstName = ""
+	id, err = testUC.CreateUser(u)
+	assert.Equal(t, -1, id)
+	assert.Error(t, err)
+	assert.EqualError(t, err, usecase.ErrEmptyField.Error())
+
+	u.FirstName = util.RandomString(10)
+	u.LastName = ""
+	id, err = testUC.CreateUser(u)
+	assert.Equal(t, -1, id)
+	assert.Error(t, err)
+	assert.EqualError(t, err, usecase.ErrEmptyField.Error())
+
+	u.LastName = util.RandomString(10)
 
 	id, err = testUC.CreateUser(u)
 	assert.NoError(t, err)
@@ -37,7 +72,7 @@ func TestGetUser(t *testing.T) {
 	user, err := testUC.GetUser(0)
 	assert.Nil(t, user)
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrDoesNotExist.Error())
+	assert.EqualError(t, err, usecase.ErrDoesNotExist.Error())
 
 	user, err = testUC.GetUser(11)
 	assert.NoError(t, err)
@@ -52,7 +87,7 @@ func TestGetUserByEmail(t *testing.T) {
 	user, err := testUC.GetUserByEmail("fake email")
 	assert.Nil(t, user)
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrDoesNotExist.Error())
+	assert.EqualError(t, err, usecase.ErrDoesNotExist.Error())
 
 	user, err = testUC.GetUserByEmail("colin.mclaughlin02@gmail.com")
 	assert.NoError(t, err)
@@ -66,7 +101,7 @@ func TestGetUserByEmail(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	err := testUC.DeleteUser(0)
 	assert.Error(t, err)
-	assert.EqualError(t, ErrDoesNotExist, err.Error())
+	assert.EqualError(t, usecase.ErrDoesNotExist, err.Error())
 
 	u := &models.User{
 		Username:       util.RandomString(20),
@@ -84,5 +119,5 @@ func TestDeleteUser(t *testing.T) {
 
 	err = testUC.DeleteUser(id)
 	assert.Error(t, err)
-	assert.EqualError(t, err, ErrDoesNotExist.Error())
+	assert.EqualError(t, err, usecase.ErrDoesNotExist.Error())
 }

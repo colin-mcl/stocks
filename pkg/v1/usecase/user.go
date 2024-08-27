@@ -11,7 +11,7 @@ import (
 
 var (
 	ErrAlreadyExists error = errors.New("error: user already exists")
-	ErrDoesNotExist  error = errors.New("error: does not exist")
+	ErrDoesNotExist  error = errors.New("error: instance does not exist")
 	ErrEmptyField    error = errors.New("error: user cannot have empty field")
 )
 
@@ -26,7 +26,7 @@ func (uc *UseCase) CreateUser(u *models.User) (int, error) {
 	}
 
 	// checks that all fields are non-empty
-	// TODO: more validation later?
+	// TODO: MOVE this to GRPC handler and maybe create validation package
 	if u.Email == "" || u.Username == "" || len(u.HashedPassword) == 0 ||
 		u.FirstName == "" || u.LastName == "" {
 		return -1, ErrEmptyField

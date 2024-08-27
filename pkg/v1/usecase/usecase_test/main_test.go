@@ -1,4 +1,4 @@
-package usecase
+package usecase_test
 
 import (
 	"log"
@@ -7,9 +7,10 @@ import (
 
 	db "github.com/colin-mcl/stocks/internal/db"
 	"github.com/colin-mcl/stocks/pkg/v1/repo"
+	"github.com/colin-mcl/stocks/pkg/v1/usecase"
 )
 
-var testUC UseCaseInterface
+var testUC usecase.UseCaseInterface
 
 func TestMain(m *testing.M) {
 	db, err := db.NewDBConn()
@@ -18,6 +19,6 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	testUC = NewUC(repo.NewRepo(db))
+	testUC = usecase.NewUC(repo.NewRepo(db))
 	os.Exit(m.Run())
 }
