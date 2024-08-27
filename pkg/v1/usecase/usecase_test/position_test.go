@@ -106,3 +106,14 @@ func TestGetPortfolio(t *testing.T) {
 		assert.Equal(t, 11, p.HeldBy)
 	}
 }
+
+func TestGetPortfolioValue(t *testing.T) {
+	res, err := testUC.GetPortfolioValue(-1)
+	assert.Equal(t, 0.0, res)
+	assert.NoError(t, err)
+
+	res, err = testUC.GetPortfolioValue(2)
+	assert.NoError(t, err)
+	assert.Positive(t, res)
+	assert.InDelta(t, 2311.87, res, 2.0)
+}

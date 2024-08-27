@@ -37,6 +37,9 @@ type UseCaseInterface interface {
 
 	// Gets all positions held by owner
 	GetPortfolio(owner int) ([]*models.Position, error)
+
+	// Gets the combined value of owner's portfolio
+	GetPortfolioValue(owner int) (float64, error)
 }
 
 type UseCase struct {

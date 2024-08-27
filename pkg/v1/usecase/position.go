@@ -59,3 +59,27 @@ func (uc *UseCase) GetPositions(symbol string, owner int) ([]*models.Position,
 func (uc *UseCase) GetPortfolio(owner int) ([]*models.Position, error) {
 	return uc.repo.GetPortfolio(owner)
 }
+
+// GetPortfolioValue
+//
+// Gets the combined value of owner's portfolio
+func (uc *UseCase) GetPortfolioValue(owner int) (float64, error) {
+	ps, err := uc.GetPortfolio(owner)
+	if err != nil {
+		return -1, err
+	}
+
+	var sum float64 = 0
+
+	for _, p := range ps {
+		quote, err := uc.GetQuote(p.Symbol)
+
+		if err != nil {
+			return -1, err
+		}
+
+		sum += p.Qty * quote.RegularMarketPrice
+	}
+
+	return sum, nil
+}
