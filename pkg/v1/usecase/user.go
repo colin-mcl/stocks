@@ -9,12 +9,6 @@ import (
 
 // the user file implements all of the user operations in the usecase interface
 
-var (
-	ErrAlreadyExists error = errors.New("error: user already exists")
-	ErrDoesNotExist  error = errors.New("error: instance does not exist")
-	ErrEmptyField    error = errors.New("error: user cannot have empty field")
-)
-
 // CreateUser
 //
 // Creates a new user from the supplied argument if the email does not

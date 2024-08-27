@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"errors"
+
 	"github.com/colin-mcl/stocks/internal/models"
 	"github.com/colin-mcl/stocks/pkg/v1/repo"
 )
@@ -9,6 +11,9 @@ import (
 // utilizes the repository interface for CRUD operations
 
 type UseCaseInterface interface {
+	// gets the quote of the given symbol from the yahoo finance API
+	GetQuote(symbol string) (*models.Quote, error)
+
 	// creates a user with the data supplied
 	CreateUser(u *models.User) (int, error)
 
@@ -41,3 +46,11 @@ type UseCase struct {
 func NewUC(repo repo.RepoInterface) UseCaseInterface {
 	return &UseCase{repo}
 }
+
+var (
+	ErrAlreadyExists error = errors.New("user already exists")
+	ErrDoesNotExist  error = errors.New("instance does not exist")
+	ErrEmptyField    error = errors.New("empty field")
+	ErrBadKey        error = errors.New("bad api key")
+	ErrBadSymbol     error = errors.New("bad symbol")
+)

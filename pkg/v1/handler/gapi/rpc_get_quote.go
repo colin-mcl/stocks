@@ -17,9 +17,6 @@ import (
 
 // TODO: make region and language options
 // 4XKTWpU6YY2Y3N6zGKdip6iICRouIJmM83ePOUWD - API key
-const (
-	yahooURL = "https://yfapi.net/v6/finance/quote?symbols=%s&region=US&lang=en"
-)
 
 // badResponse indicates that the api key provided (or lack thereof) did not
 // successfully work with the yahoo finance api and should be replaced
