@@ -70,14 +70,12 @@ func TestGetPosition(t *testing.T) {
 
 func TestGetPositions(t *testing.T) {
 	res, err := testUC.GetPositions("a", 11)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, res)
-	assert.EqualError(t, err, usecase.ErrDoesNotExist.Error())
 
 	res, err = testUC.GetPositions("TSLA", 1)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Nil(t, res)
-	assert.EqualError(t, err, usecase.ErrDoesNotExist.Error())
 
 	res, err = testUC.GetPositions("TSLA", 11)
 	assert.NoError(t, err)
@@ -89,5 +87,22 @@ func TestGetPositions(t *testing.T) {
 		assert.Equal(t, 210.1, p.PurchasePrice)
 		assert.Equal(t, 2.5, p.Qty)
 		assert.True(t, time.Now().After(p.PurchasedAt))
+	}
+}
+
+func TestGetPortfolio(t *testing.T) {
+	ps, err := testUC.GetPortfolio(1)
+	assert.Nil(t, ps)
+	assert.NoError(t, err)
+
+	ps, err = testUC.GetPortfolio(11)
+	assert.NotNil(t, ps)
+	assert.NoError(t, err)
+
+	for _, p := range ps {
+		assert.True(t, (p.Symbol == "TSLA" || p.Symbol == "AAPL"))
+		assert.GreaterOrEqual(t, p.PurchasePrice, 210.1)
+		assert.GreaterOrEqual(t, p.Qty, 2.5)
+		assert.Equal(t, 11, p.HeldBy)
 	}
 }

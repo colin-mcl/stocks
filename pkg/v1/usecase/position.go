@@ -50,15 +50,12 @@ func (uc *UseCase) GetPosition(id int) (*models.Position, error) {
 func (uc *UseCase) GetPositions(symbol string, owner int) ([]*models.Position,
 	error) {
 
-	ps, err := uc.repo.GetPositions(symbol, owner)
+	return uc.repo.GetPositions(symbol, owner)
+}
 
-	if err != nil {
-		return nil, err
-	}
-
-	if ps == nil {
-		return nil, ErrDoesNotExist
-	}
-
-	return ps, err
+// GetPortfolio
+//
+// Gets all positions held by owner and retunrs the result as a slice
+func (uc *UseCase) GetPortfolio(owner int) ([]*models.Position, error) {
+	return uc.repo.GetPortfolio(owner)
 }

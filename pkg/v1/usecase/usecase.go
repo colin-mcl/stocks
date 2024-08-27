@@ -29,6 +29,9 @@ type UseCaseInterface interface {
 
 	// Gets all positions matching the symbol and owner ID
 	GetPositions(symbol string, owner int) ([]*models.Position, error)
+
+	// Gets all positions held by owner
+	GetPortfolio(owner int) ([]*models.Position, error)
 }
 
 type UseCase struct {
