@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"strings"
+
 	"github.com/colin-mcl/stocks/internal/models"
 )
 
@@ -52,4 +54,45 @@ func (repo *Repo) GetPosition(id int) (*models.Position, error) {
 	}
 
 	return p, nil
+}
+
+// gets all positions with the matching symbol and owner
+func (repo *Repo) GetPositions(symbol string, owner int) ([]*models.Position,
+	error) {
+	stmt := `SELECT * FROM positions WHERE symbol = ? AND heldBy = ?`
+
+	rows, err := repo.db.Query(stmt, strings.ToUpper(symbol), owner)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var positions []*models.Position
+
+	for rows.Next() {
+		p := &models.Position{}
+
+		err := rows.Scan(
+			&p.ID,
+			&p.Symbol,
+			&p.HeldBy,
+			&p.PurchasedAt,
+			&p.PurchasePrice,
+			&p.Qty)
+
+		if err != nil {
+			return nil, err
+		}
+
+		positions = append(positions, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return positions, nil
+
 }

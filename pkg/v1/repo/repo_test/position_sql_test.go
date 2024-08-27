@@ -61,3 +61,25 @@ func TestGetPosition(t *testing.T) {
 	assert.Equal(t, pos.PurchasePrice, p.PurchasePrice)
 	assert.Equal(t, pos.Qty, p.Qty)
 }
+
+func TestGetPositions(t *testing.T) {
+	ps, err := testRepo.GetPositions("fake symbol", 11)
+	assert.NoError(t, err)
+	assert.Nil(t, ps)
+
+	ps, err = testRepo.GetPositions("AAPL", 1)
+	assert.Nil(t, ps)
+
+	ps, err = testRepo.GetPositions("TSLA", 11)
+	assert.NotNil(t, ps)
+	assert.NoError(t, err)
+	assert.Equal(t, 11, len(ps))
+
+	for _, p := range ps {
+		assert.Equal(t, 11, p.HeldBy)
+		assert.Equal(t, 210.1, p.PurchasePrice)
+		assert.Equal(t, 2.5, p.Qty)
+		assert.Equal(t, "TSLA", p.Symbol)
+		assert.Positive(t, p.ID)
+	}
+}

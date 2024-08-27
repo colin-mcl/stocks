@@ -32,6 +32,9 @@ type RepoInterface interface {
 
 	// gets the position with the matching ID if it exists
 	GetPosition(id int) (*models.Position, error)
+
+	// gets all positions with the matching symbol and owner
+	GetPositions(symbol string, owner int) ([]*models.Position, error)
 }
 
 type Repo struct {
